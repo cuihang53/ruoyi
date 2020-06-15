@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysSalesOrderMapper">
+
+    <resultMap type="SysSalesOrder" id="SysSalesDetailResult">
+        <result property="salesDetailId" column="sales_detail_id"/>
+        <result property="buldingid" column="buldingid"/>
+        <result property="houseid" column="houseid"/>
+        <result property="salseFloorPrice" column="salse_floor_price"/>
+        <result property="bookBuyer" column="book_buyer"/>
+        <result property="buyertime" column="buyerTime"/>
+        <result property="bookBuyerPrice" column="book_buyer_price"/>
+        <result property="bookBuyerAllprice" column="book_buyer_allPrice"/>
+        <result property="contracttime" column="contract_time"/>
+        <result property="finalBuyer" column="final_buyer"/>
+        <result property="contractPrice" column="contract_price"/>
+        <result property="contractAllprice" column="contract_allPrice"/>
+        <result property="payMethod" column="pay_method"/>
+        <result property="floorPriceSure" column="floor_price_sure"/>
+        <result property="collection" column="collection"/>
+        <result property="surplusPrice" column="surplus_price"/>
+        <result property="commissionTime" column="commission_time"/>
+        <result property="installmentPrice" column="installment_price"/>
+        <result property="rantPrice" column="rant_price"/>
+        <result property="mortgagePrice" column="mortgage_price"/>
+        <result property="buyerPrice" column="buyer_price"/>
+        <result property="bookBuyerPhone" column="book_BuyerPhone"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="orderStatus" column="status"/>
+        <result property="finalBuyerPhone" column="final_buyer_phone"/>
+        <result property="rdInstallmentPrice" column="rd_installmentPrice"/>
+        <result property="rmiInstallmentPrice" column="rmi_installmentPrice"/>
+        <result property="priceEndTime" column="price_end_time"/>
+        <result property="salePerson" column="sale_person"/>
+        <result property="flowId" column="flow_id"/>
+        <association property="bulding" column="bulding_id" javaType="SysBuilding" resultMap="buldingResult"/>
+        <association property="house" column="house_id" javaType="SysHouse" resultMap="houseResult"/>
+        <association property="houseUnit" column="house_unit_id" javaType="SysHouseUnit" resultMap="houseUnitResult"/>
+        <association property="createUser" column="create_by" javaType="SysUser" resultMap="userResult"/>
+        <association property="flow" column="flow_id" javaType="SysFlow" resultMap="SysFlowResult"/>
+        <collection property="commissionList" javaType="java.util.List" resultMap="commissionResult"/>
+    </resultMap>
+
+    <resultMap type="SysFlow" id="SysFlowResult">
+        <result property="id"    column="id"    />
+        <result property="applyuser"    column="applyUser"    />
+        <result property="handleruser"    column="handlerUser"    />
+        <result property="status"    column="status"    />
+        <result property="type"    column="type"    />
+        <result property="typeId"    column="type_id"    />
+    </resultMap>
+
+    <resultMap type="SysUser" id="userResult">
+        <id     property="userId"       column="user_id"      />
+        <result property="deptId"       column="dept_id"      />
+        <result property="loginName"    column="login_name"   />
+        <result property="userName"     column="user_name"    />
+    </resultMap>
+
+    <resultMap id="houseUnitResult" type="SysHouseUnit">
+        <result property="houseUnitId" column="house_unit_id"/>
+        <result property="buildingId" column="building_Id"/>
+        <result property="houseUnitName" column="house_unit_name"/>
+        <result property="unitCode" column="unit_code"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="commissionResult" type="SysCommission">
+        <result property="commissionId" column="commission_id"/>
+        <result property="salesDetailId" column="Sales_Detail_id"/>
+        <result property="houseid" column="houseid"/>
+        <result property="postId" column="post_id"/>
+        <result property="remind" column="remind"/>
+        <result property="userId" column="user_id"/>
+        <result property="dibProportion" column="dib_proportion"/>
+        <result property="roomProportion" column="room_proportion"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <resultMap id="buldingResult" type="SysBuilding">
+        <result property="buildingId" column="building_id"/>
+        <result property="buildingCode" column="building_code"/>
+        <result property="buildingName" column="building_name"/>
+        <result property="buildingType" column="building_type"/>
+    </resultMap>
+
+    <resultMap id="houseResult" type="sysHouse">
+        <result property="houseId" column="house_id"/>
+        <result property="buldingId" column="bulding_id"/>
+        <result property="houseUtilId" column="unit_id"/>
+        <result property="houseNumber" column="house_number"/>
+        <result property="buildingType" column="building_type"/>
+        <result property="floor" column="floor"/>
+        <result property="price" column="price"/>
+        <result property="propertyRights" column="Property_rights"/>
+        <result property="area" column="area"/>
+        <result property="innerArea" column="inner_area"/>
+        <result property="realArea" column="real_area"/>
+        <association property="houseUnit" column="house_unit_id" javaType="SysHouseUnit" resultMap="houseUnitResult"/>
+    </resultMap>
+
+    <sql id="selectSysSalesDetailVo">
+    select d.sales_detail_id, d.buldingid,d.flow_id, d.houseid, d.salse_floor_price, d.book_buyer,d.buyerTime,d.rant_price,d.installment_price,
+    d.mortgage_price,d.buyer_price,d.book_BuyerPhone,d.status,d.final_buyer_phone,d.rd_installmentPrice,d.rmi_installmentPrice,
+    d.book_buyer_price,d.book_buyer_allPrice,d.contract_time,d.final_buyer, d.contract_price, d.contract_allPrice,d.price_end_time,
+    d.pay_method, d.floor_price_sure,d.collection, d.surplus_price,d.commission_time,d.remark,d.create_by,
+    d.create_time,d.update_by,d.update_time,d.sale_person,
+    u.unit_code, u.house_unit_name,
+    us.user_id,us.user_name,us.login_name,
+    h.house_id,h.area,h.bulding_id, h.unit_id, h.house_number, h.building_type, h.floor, h.price, h.Property_rights,
+    h.inner_area,h.real_area,
+    b.building_id,b.building_name,c.commission_id,c.house_id,c.post_id,c.remind,c.user_id,c.dib_proportion,
+    c.room_proportion,c.remark
+    from sys_sales_detail d
+    left join SYS_HOUSE h on d.houseid = h.house_id
+    left join sys_house_unit u on u.house_unit_id = h.unit_id
+    left join SYS_BUILDING b on b.building_id = d.buldingid
+    left join SYS_Commission c on c.sales_detail_id = d.sales_detail_id
+    left join sys_user us on us.user_id = d.create_by
+    left join sys_flow fl on fl.type_id = d.sales_detail_id
+    </sql>
+
+    <select id="selectSysSalesDetailList" parameterType="SysSalesOrder" resultMap="SysSalesDetailResult">
+        <include refid="selectSysSalesDetailVo"/>
+        <where>
+            <if test="house != null  and house.houseNumber !=null and house.houseNumber!=''">
+                and h.house_number = #{house.houseNumber}
+            </if>
+            <if test="salePerson != null  and salePerson!=''">
+                and d.sale_person = #{salePerson}
+            </if>
+            <if test="orderStatus != null  and orderStatus!=''">
+                and d.status = #{orderStatus}
+            </if>
+            <if test="bulding != null  and bulding.buildingName !=null and bulding.buildingName!=''">
+                and b.building_name like concat('%', #{bulding.buildingName}, '%')
+            </if>
+            <if test="buldingid != null ">and buldingid = #{buldingid}</if>
+            <if test="houseid != null ">and houseid = #{houseid}</if>
+            <if test="salseFloorPrice != null ">and salse_floor_price = #{salseFloorPrice}</if>
+            <if test="bookBuyer != null  and bookBuyer != ''">
+                and book_buyer like concat('%', #{bookBuyer}, '%')
+            </if>
+            <if test="bookBuyerPrice != null ">and book_buyer_price = #{bookBuyerPrice}</if>
+            <if test="bookBuyerAllprice != null ">and book_buyer_allPrice = #{bookBuyerAllprice}</if>
+            <if test="finalBuyer != null  and finalBuyer != ''">
+                and final_buyer like concat('%', #{finalBuyer}, '%')
+            </if>
+            <if test="contractPrice != null ">and contract_price = #{contractPrice}</if>
+            <if test="contractAllprice != null ">and contract_allPrice = #{contractAllprice}</if>
+            <if test="payMethod != null  and payMethod != ''">and pay_method = #{payMethod}</if>
+            <if test="floorPriceSure != null  and floorPriceSure != ''">and floor_price_sure = #{floorPriceSure}</if>
+            <if test="collection != null ">and collection = #{collection}</if>
+            <if test="surplusPrice != null ">and surplus_price = #{surplusPrice}</if>
+
+            <if test="params.beginBuyertime != null and params.beginBuyertime != ''"><!-- 认购时间开始时间检索 -->
+                AND date_format(buyerTime,'%y%m%d') &gt;= date_format(#{params.beginBuyertime},'%y%m%d')
+            </if>
+            <if test="params.endBuyertime != null and params.endBuyertime != ''"><!-- 认购时间结束时间检索 -->
+                AND date_format(buyerTime,'%y%m%d') &lt;= date_format(#{params.endBuyertime},'%y%m%d')
+            </if>
+
+            <if test="params.beginContracttime != null and params.beginContracttime != ''"><!-- 签合同时间开始时间检索 -->
+                AND date_format(contract_time,'%y%m%d') &gt;= date_format(#{params.beginContracttime},'%y%m%d')
+            </if>
+            <if test="params.endContracttime != null and params.endContracttime != ''"><!-- 签合同时间结束时间检索 -->
+                AND date_format(contract_time,'%y%m%d') &lt;= date_format(#{params.endContracttime},'%y%m%d')
+            </if>
+
+            <if test="params.beginPriceEndTime != null and params.beginPriceEndTime != ''"><!-- 房款结清时间开始时间检索 -->
+                AND date_format(price_end_time,'%y%m%d') &gt;= date_format(#{params.beginPriceEndTime},'%y%m%d')
+            </if>
+            <if test="params.endPriceEndTime != null and params.endPriceEndTime != ''"><!-- 房款结清时间结束时间检索 -->
+                AND date_format(price_end_time,'%y%m%d') &lt;= date_format(#{params.endPriceEndTime},'%y%m%d')
+            </if>
+
+            <if test="params.beginCreatTime != null and params.beginCreatTime != ''"><!-- 创建时间开始时间检索 -->
+                AND date_format(d.create_time,'%y%m%d') &gt;= date_format(#{params.beginCreatTime},'%y%m%d')
+            </if>
+            <if test="params.endCreatTime != null and params.endCreatTime != ''"><!-- 创建时间结束时间检索 -->
+                AND date_format(d.create_time,'%y%m%d') &lt;= date_format(#{params.endCreatTime},'%y%m%d')
+            </if>
+
+        </where>
+    </select>
+
+    <select id="selectSysSalesDetailById" parameterType="Long" resultMap="SysSalesDetailResult">
+        <include refid="selectSysSalesDetailVo"/>
+        where d.sales_detail_id = #{salesDetailId}
+    </select>
+
+    <insert id="insertSysSalesDetail" parameterType="SysSalesOrder" useGeneratedKeys="true"
+            keyProperty="salesDetailId">
+        insert into sys_sales_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="buldingid != null ">buldingid,</if>
+            <if test="salePerson != null ">sale_person,</if>
+            <if test="houseid != null ">houseid,</if>
+            <if test="salseFloorPrice != null ">salse_floor_price,</if>
+            <if test="bookBuyer != null  and bookBuyer != ''">book_buyer,</if>
+            <if test="buyertime != null ">buyerTime,</if>
+            <if test="bookBuyerPrice != null ">book_buyer_price,</if>
+            <if test="bookBuyerAllprice != null ">book_buyer_allPrice,</if>
+            <if test="contracttime != null ">contract_time,</if>
+            <if test="finalBuyer != null  and finalBuyer != ''">final_buyer,</if>
+            <if test="contractPrice != null ">contract_price,</if>
+            <if test="contractAllprice != null ">contract_allPrice,</if>
+            <if test="payMethod != null  and payMethod != ''">pay_method,</if>
+            <if test="floorPriceSure != null  and floorPriceSure != ''">floor_price_sure,</if>
+            <if test="collection != null ">collection,</if>
+            <if test="surplusPrice != null ">surplus_price,</if>
+            <if test="commissionTime != null ">commission_time,</if>
+            <if test="rantPrice != null ">rant_price,</if>
+            <if test="installmentPrice != null ">installment_price,</if>
+            <if test="mortgagePrice != null ">mortgage_price,</if>
+            <if test="buyerPrice != null ">buyer_price,</if>
+            <if test="bookBuyerPhone != null ">book_BuyerPhone,</if>
+            <if test="remark != null  and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="orderStatus != null and orderStatus != ''">status,</if>
+            <if test="finalBuyerPhone != null and finalBuyerPhone != ''">final_buyer_phone,</if>
+            <if test="rdInstallmentPrice != null and rdInstallmentPrice != ''">rd_installmentPrice,</if>
+            <if test="rmiInstallmentPrice != null and rmiInstallmentPrice != ''">rmi_installmentPrice,</if>
+            <if test="priceEndTime != null">price_end_time,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="buldingid != null ">#{buldingid},</if>
+            <if test="salePerson != null ">#{salePerson},</if>
+            <if test="houseid != null ">#{houseid},</if>
+            <if test="salseFloorPrice != null ">#{salseFloorPrice},</if>
+            <if test="bookBuyer != null  and bookBuyer != ''">#{bookBuyer},</if>
+            <if test="buyertime != null ">#{buyertime},</if>
+            <if test="bookBuyerPrice != null ">#{bookBuyerPrice},</if>
+            <if test="bookBuyerAllprice != null ">#{bookBuyerAllprice},</if>
+            <if test="contracttime != null ">#{contracttime},</if>
+            <if test="finalBuyer != null  and finalBuyer != ''">#{finalBuyer},</if>
+            <if test="contractPrice != null ">#{contractPrice},</if>
+            <if test="contractAllprice != null ">#{contractAllprice},</if>
+            <if test="payMethod != null  and payMethod != ''">#{payMethod},</if>
+            <if test="floorPriceSure != null  and floorPriceSure != ''">#{floorPriceSure},</if>
+            <if test="collection != null ">#{collection},</if>
+            <if test="surplusPrice != null ">#{surplusPrice},</if>
+            <if test="commissionTime != null ">#{commissionTime},</if>
+            <if test="rantPrice != null ">#{rantPrice},</if>
+            <if test="installmentPrice != null ">#{installmentPrice},</if>
+            <if test="mortgagePrice != null ">#{mortgagePrice},</if>
+            <if test="buyerPrice != null ">#{buyerPrice},</if>
+            <if test="bookBuyerPhone != null ">#{bookBuyerPhone},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="orderStatus != null and orderStatus != ''">#{orderStatus},</if>
+            <if test="finalBuyerPhone != null and finalBuyerPhone != ''">#{finalBuyerPhone},</if>
+            <if test="rdInstallmentPrice != null and rdInstallmentPrice != ''">#{rdInstallmentPrice},</if>
+            <if test="rmiInstallmentPrice != null and rmiInstallmentPrice != ''">#{rmiInstallmentPrice},</if>
+            <if test="priceEndTime != null">#{priceEndTime},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateSysSalesDetail" parameterType="SysSalesOrder">
+        update sys_sales_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="buldingid != null ">buldingid = #{buldingid},</if>
+            <if test="houseid != null ">houseid = #{houseid},</if>
+            <if test="salseFloorPrice != null ">salse_floor_price = #{salseFloorPrice},</if>
+            <if test="bookBuyer != null  and bookBuyer != ''">book_buyer = #{bookBuyer},</if>
+            <if test="buyertime != null ">buyerTime = #{buyertime},</if>
+            <if test="bookBuyerPrice != null ">book_buyer_price = #{bookBuyerPrice},</if>
+            <if test="bookBuyerAllprice != null ">book_buyer_allPrice = #{bookBuyerAllprice},</if>
+            <if test="contracttime != null ">contract_time = #{contracttime},</if>
+            <if test="finalBuyer != null  and finalBuyer != ''">final_buyer = #{finalBuyer},</if>
+            <if test="contractPrice != null ">contract_price = #{contractPrice},</if>
+            <if test="contractAllprice != null ">contract_allPrice = #{contractAllprice},</if>
+            <if test="payMethod != null  and payMethod != ''">pay_method = #{payMethod},</if>
+            <if test="floorPriceSure != null  and floorPriceSure != ''">floor_price_sure = #{floorPriceSure},</if>
+            <if test="collection != null ">collection = #{collection},</if>
+            <if test="surplusPrice != null ">surplus_price = #{surplusPrice},</if>
+            <if test="commissionTime != null ">commission_time = #{commissionTime},</if>
+            <if test="rantPrice != null ">rant_price = #{rantPrice},</if>
+            <if test="installmentPrice != null ">installment_price = #{installmentPrice},</if>
+            <if test="mortgagePrice != null ">mortgage_price = #{mortgagePrice},</if>
+            <if test="buyerPrice != null ">buyer_price = #{buyerPrice},</if>
+            <if test="bookBuyerPhone != null ">book_BuyerPhone = #{bookBuyerPhone},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="orderStatus != null and orderStatus != ''">status = #{orderStatus},</if>
+            <if test="finalBuyerPhone != null and finalBuyerPhone != ''">final_buyer_phone = #{finalBuyerPhone},</if>
+            <if test="rdInstallmentPrice != null and rdInstallmentPrice != ''">rd_installmentPrice =
+                #{rdInstallmentPrice},
+            </if>
+            <if test="rmiInstallmentPrice != null and rmiInstallmentPrice != ''">rmi_installmentPrice =
+                #{rmiInstallmentPrice},
+            </if>
+            <if test="salePerson != null and salePerson != ''">sale_person = #{salePerson},
+            </if>
+            <if test="flowId != null">flow_id = #{flowId},
+            </if>
+            price_end_time = #{priceEndTime},
+            update_time = sysdate()
+        </trim>
+        where sales_detail_id = #{salesDetailId}
+    </update>
+
+    <delete id="deleteSysSalesDetailById" parameterType="Long">
+        delete from sys_sales_detail where sales_detail_id = #{salesDetailId}
+    </delete>
+
+    <delete id="deleteSysSalesDetailByIds" parameterType="String">
+        delete from sys_sales_detail where sales_detail_id in
+        <foreach item="salesDetailId" collection="array" open="(" separator="," close=")">
+            #{salesDetailId}
+        </foreach>
+    </delete>
+
+</mapper>

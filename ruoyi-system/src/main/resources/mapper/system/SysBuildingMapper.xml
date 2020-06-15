@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysBuildingMapper">
+    
+    <resultMap type="SysBuilding" id="SysBuildingResult">
+        <result property="buildingId"    column="building_id"    />
+        <result property="buildingCode"    column="building_code"    />
+        <result property="buildingName"    column="building_name"    />
+        <result property="buildingType"    column="building_type"    />
+    </resultMap>
+
+    <sql id="selectSysBuildingVo">
+        select building_id, building_code, building_name, building_type from sys_building
+    </sql>
+
+    <select id="selectSysBuildingByname" parameterType="String" resultMap="SysBuildingResult">
+        <include refid="selectSysBuildingVo"/>
+        where building_name = #{buildingName}
+    </select>
+
+
+    <select id="selectSysBuildingList" parameterType="SysBuilding" resultMap="SysBuildingResult">
+        <include refid="selectSysBuildingVo"/>
+        <where>  
+            <if test="buildingCode != null  and buildingCode != ''"> and building_code = #{buildingCode}</if>
+            <if test="buildingName != null  and buildingName != ''"> and building_name like concat('%', #{buildingName}, '%')</if>
+            <if test="buildingType != null  and buildingType != ''"> and building_type = #{buildingType}</if>
+        </where>
+    </select>
+
+    <select id="isExistBuildingCode" parameterType="SysBuilding" resultMap="SysBuildingResult">
+        <include refid="selectSysBuildingVo"/>
+        <where>
+            <if test="buildingCode != null  and buildingCode != ''"> and building_code = #{buildingCode}</if>
+        </where>
+    </select>
+
+    <select id="isExistBuildingName" parameterType="SysBuilding" resultMap="SysBuildingResult">
+        <include refid="selectSysBuildingVo"/>
+        <where>
+            <if test="buildingName != null  and buildingName != ''"> and  building_name = #{buildingName}</if>
+        </where>
+    </select>
+
+    <select id="selectSysBuildingAll" resultMap="SysBuildingResult">
+        <include refid="selectSysBuildingVo"/>
+    </select>
+
+
+    <select id="selectSysBuildingById" parameterType="Long" resultMap="SysBuildingResult">
+        <include refid="selectSysBuildingVo"/>
+        where building_id = #{buildingId}
+    </select>
+        
+    <insert id="insertSysBuilding" parameterType="SysBuilding" useGeneratedKeys="true" keyProperty="buildingId">
+        insert into sys_building
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="buildingCode != null  and buildingCode != ''">building_code,</if>
+            <if test="buildingName != null  and buildingName != ''">building_name,</if>
+            <if test="buildingType != null  and buildingType != ''">building_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="buildingCode != null  and buildingCode != ''">#{buildingCode},</if>
+            <if test="buildingName != null  and buildingName != ''">#{buildingName},</if>
+            <if test="buildingType != null  and buildingType != ''">#{buildingType},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysBuilding" parameterType="SysBuilding">
+        update sys_building
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="buildingCode != null  and buildingCode != ''">building_code = #{buildingCode},</if>
+            <if test="buildingName != null  and buildingName != ''">building_name = #{buildingName},</if>
+            <if test="buildingType != null  and buildingType != ''">building_type = #{buildingType},</if>
+        </trim>
+        where building_id = #{buildingId}
+    </update>
+
+    <delete id="deleteSysBuildingById" parameterType="Long">
+        delete from sys_building where building_id = #{buildingId}
+    </delete>
+
+    <delete id="deleteSysBuildingByIds" parameterType="String">
+        delete from sys_building where building_id in 
+        <foreach item="buildingId" collection="array" open="(" separator="," close=")">
+            #{buildingId}
+        </foreach>
+    </delete>
+    
+</mapper>

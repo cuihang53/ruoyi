@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysHouseMapper">
+
+    <resultMap type="SysHouse" id="SysHouseResult">
+        <result property="houseId" column="house_id"/>
+        <result property="buldingId" column="bulding_id"/>
+        <result property="houseUtilId" column="unit_id"/>
+        <result property="houseNumber" column="house_number"/>
+        <result property="buildingType" column="building_type"/>
+        <result property="floor" column="floor"/>
+        <result property="price" column="price"/>
+        <result property="propertyRights" column="Property_rights"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="area" column="area"/>
+        <result property="innerArea" column="inner_area"/>
+        <result property="realArea" column="real_area"/>
+        <association property="bulding" column="bulding_id" javaType="SysBuilding" resultMap="buldingResult"/>
+        <association property="houseUnit" column="house_unit_id" javaType="SysHouseUnit" resultMap="houseUnitResult"/>
+    </resultMap>
+
+    <resultMap id="buldingResult" type="SysBuilding">
+        <result property="buildingId" column="building_id"/>
+        <result property="buildingCode" column="building_code"/>
+        <result property="buildingName" column="building_name"/>
+        <result property="buildingType" column="building_type"/>
+    </resultMap>
+
+    <resultMap id="houseUnitResult" type="SysHouseUnit">
+        <result property="houseUnitId" column="house_unit_id"/>
+        <result property="buildingId" column="building_Id"/>
+        <result property="houseUnitName" column="house_unit_name"/>
+    </resultMap>
+
+    <sql id="selectSysHouseVo">
+        select h.house_id,h.area,h.bulding_id, h.unit_id, h.house_number, h.building_type, h.floor, h.price, h.Property_rights,
+        h.inner_area,h.real_area,
+        b.building_id,b.building_code,b.building_name,b.building_type,u.house_unit_id,u.building_Id,u.house_unit_name,bu.building_name
+        from sys_house h
+        left join sys_building b on h.bulding_id = b.building_id
+        left join sys_house_unit u on u.house_unit_id = h.unit_id
+        left join sys_building bu on bu.building_id = u.building_Id
+    </sql>
+
+
+    <select id="selectSysHouseAll" parameterType="SysHouse" resultMap="SysHouseResult">
+        <include refid="selectSysHouseVo"/>
+    </select>
+
+
+    <select id="selectSysHouseList" parameterType="SysHouse" resultMap="SysHouseResult">
+        <include refid="selectSysHouseVo"/>
+        <where>
+            <if test="bulding != null  and bulding.buildingName!=null and bulding.buildingName!= ''">and b.building_name
+                like concat('%', #{bulding.buildingName}, '%')
+            </if>
+            <if test="houseUnit != null and houseUnit.houseUnitName!=null  and houseUnit.houseUnitName!= ''">and
+                u.house_unit_name like concat('%', #{houseUnit.houseUnitName}, '%')
+            </if>
+            <if test="area != null  and area != ''">and area = #{area}</if>
+            <if test="houseUtilId != null  and houseUtilId != ''">and unit_id = #{houseUtilId}</if>
+            <if test="houseNumber != null  and houseNumber != ''">and house_number = #{houseNumber}</if>
+            <if test="buildingType != null  and buildingType != ''">and b.building_type = #{buildingType}</if>
+            <if test="floor != null  and floor != ''">and floor = #{floor}</if>
+            <if test="price != null ">and price = #{price}</if>
+            <if test="propertyRights != null  and propertyRights != ''">and Property_rights = #{propertyRights}</if>
+        </where>
+    </select>
+
+    <select id="isExistHouseNum" parameterType="SysHouse" resultMap="SysHouseResult">
+        <include refid="selectSysHouseVo"/>
+        <where>
+            <if test="houseUtilId != null  and houseUtilId != ''">and unit_id = #{houseUtilId}</if>
+            <if test="houseNumber != null  and houseNumber != ''">and house_number = #{houseNumber}</if>
+            <if test="buildingType != null  and buildingType != ''">and bulding_id = #{buldingId}</if>
+        </where>
+    </select>
+
+
+    <select id="selectSysHouse" parameterType="SysHouse" resultMap="SysHouseResult">
+        <include refid="selectSysHouseVo"/>
+        <where>
+            <if test="houseUtilId != null  and houseUtilId != ''">and unit_id = #{houseUtilId}</if>
+            <if test="houseNumber != null  and houseNumber != ''">and house_number = #{houseNumber}</if>
+            <if test="buildingType != null  and buildingType != ''">and building_type = #{buildingType}</if>
+            <if test="floor != null  and floor != ''">and floor = #{floor}</if>
+            <if test="price != null ">and price = #{price}</if>
+            <if test="propertyRights != null  and propertyRights != ''">and Property_rights = #{propertyRights}</if>
+        </where>
+    </select>
+
+
+    <select id="selectSysHouseById" parameterType="Long" resultMap="SysHouseResult">
+        <include refid="selectSysHouseVo"/>
+        where house_id = #{houseId}
+    </select>
+
+    <insert id="insertSysHouse" parameterType="SysHouse" useGeneratedKeys="true" keyProperty="houseId">
+        insert into sys_house(
+        <if test="buldingId != null  and buldingId != ''">bulding_id,</if>
+        <if test="houseUtilId != null  and houseUtilId != ''">unit_id,</if>
+        <if test="houseNumber != null  and houseNumber != ''">house_number,</if>
+        <if test="buildingType != null  and buildingType != ''">building_type,</if>
+        <if test="floor != null  and floor != ''">floor,</if>
+        <if test="price != null ">price,</if>
+        <if test="propertyRights != null  and propertyRights != ''">Property_rights,</if>
+        <if test="area != null and area != ''">area,</if>
+        <if test="innerArea != null and innerArea != ''">inner_area,</if>
+        <if test="realArea != null and realArea != ''">real_area,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )values
+        (
+        <if test="buldingId != null  and buldingId != ''">#{buldingId},</if>
+        <if test="houseUtilId != null  and houseUtilId != ''">#{houseUtilId},</if>
+        <if test="houseNumber != null  and houseNumber != ''">#{houseNumber},</if>
+        <if test="buildingType != null  and buildingType != ''">#{buildingType},</if>
+        <if test="floor != null  and floor != ''">#{floor},</if>
+        <if test="price != null ">#{price},</if>
+        <if test="propertyRights != null  and propertyRights != ''">#{propertyRights},</if>
+        <if test="area != null and area != ''">#{area},</if>
+        <if test="innerArea != null and innerArea != ''">#{innerArea},</if>
+        <if test="realArea != null and realArea != ''">#{realArea},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <update id="updateSysHouse" parameterType="SysHouse">
+        update sys_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="buldingId != null  and buldingId != ''">bulding_id = #{buldingId},</if>
+            <if test="houseUtilId != null  and houseUtilId != ''">unit_id = #{houseUtilId},</if>
+            <if test="houseNumber != null  and houseNumber != ''">house_number = #{houseNumber},</if>
+            building_type = #{buildingType},
+            floor = #{floor},
+            price = #{price},
+            Property_rights = #{propertyRights},
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            area = #{area},
+            inner_area = #{innerArea},
+            real_area = #{realArea},
+            update_time = sysdate()
+        </trim>
+        where house_id = #{houseId}
+    </update>
+
+    <delete id="deleteSysHouseById" parameterType="Long">
+        delete from sys_house where house_id = #{houseId}
+    </delete>
+
+    <delete id="deleteSysHouseByIds" parameterType="String">
+        delete from sys_house where house_id in
+        <foreach item="houseId" collection="array" open="(" separator="," close=")">
+            #{houseId}
+        </foreach>
+    </delete>
+
+</mapper>

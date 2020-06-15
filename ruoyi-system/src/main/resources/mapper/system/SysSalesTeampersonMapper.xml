@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysSalesTeampersonMapper">
+    
+    <resultMap type="SysSalesTeamperson" id="SysSalesTeampersonResult">
+        <result property="salesId"    column="sales_id"    />
+        <result property="salesTeamId"    column="sales_Team_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="entryTime"    column="entry_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="user" column="user_id" javaType="SysUser" resultMap="userResult"/>
+        <association property="team" column="sales_Team_id" javaType="SysSalesTeam" resultMap="teamResult"/>
+    </resultMap>
+
+    <resultMap type="SysSalesTeam" id="teamResult">
+        <result property="id"    column="id"    />
+        <result property="teamName"    column="team_name"    />
+    </resultMap>
+
+    <resultMap type="SysUser" id="userResult">
+        <id     property="userId"       column="user_id"      />
+        <result property="deptId"       column="dept_id"      />
+        <result property="loginName"    column="login_name"   />
+        <result property="userName"     column="user_name"    />
+        <result property="userType"     column="user_type"    />
+        <result property="email"        column="email"        />
+        <result property="phonenumber"  column="phonenumber"  />
+        <result property="sex"          column="sex"          />
+        <result property="avatar"       column="avatar"       />
+        <result property="password"     column="password"     />
+        <result property="salt"         column="salt"         />
+        <result property="status"       column="status"       />
+        <result property="delFlag"      column="del_flag"     />
+    </resultMap>
+
+    <sql id="selectSysSalesTeampersonVo">
+        select p.sales_id, p.sales_Team_id, p.user_id, p.entry_time, p.end_time, p.create_by, p.create_time, p.update_by, p.update_time,
+         u.user_id, u.dept_id, u.login_name, u.user_name, u.user_type, u.email, u.avatar, u.phonenumber,
+         u.sex, u.password, u.salt, u.status, u.del_flag,t.team_name
+        from sys_sales_teamperson p
+        left join sys_user u on u.user_id = p.user_id
+        left join sys_sales_team t on t.id = p.sales_Team_id
+    </sql>
+
+    <select id="selectSysSalesTeampersonList" parameterType="SysSalesTeamperson" resultMap="SysSalesTeampersonResult">
+        <include refid="selectSysSalesTeampersonVo"/>
+        <where>
+            <if test="user.userName != null  and user.userName != '' "> and u.user_name = #{user.userName}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="salesTeamId != null "> and sales_Team_id = #{salesTeamId}</if>
+            <if test="entryTime != null "> and entry_time = #{entryTime}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+        </where>
+    </select>
+
+
+    <select id="selectSysSalesTeampersonById" parameterType="Long" resultMap="SysSalesTeampersonResult">
+        <include refid="selectSysSalesTeampersonVo"/>
+        where sales_id = #{salesId}
+    </select>
+
+
+
+    <select id="selectByTeamId" parameterType="Long" resultMap="SysSalesTeampersonResult">
+        <include refid="selectSysSalesTeampersonVo"/>
+        where sales_Team_id = #{salesTeamId}
+    </select>
+
+        
+    <insert id="insertSysSalesTeamperson" parameterType="SysSalesTeamperson" useGeneratedKeys="true" keyProperty="salesId">
+        insert into sys_sales_teamperson
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="salesTeamId != null ">sales_Team_id,</if>
+            <if test="userId != null ">user_id,</if>
+            <if test="entryTime != null ">entry_time,</if>
+            <if test="endTime != null ">end_time,</if>
+            <if test="createBy != null  and createBy != ''">create_by,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="updateBy != null  and updateBy != ''">update_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="salesTeamId != null ">#{salesTeamId},</if>
+            <if test="userId != null ">#{userId},</if>
+            <if test="entryTime != null ">#{entryTime},</if>
+            <if test="endTime != null ">#{endTime},</if>
+            <if test="createBy != null  and createBy != ''">#{createBy},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysSalesTeamperson" parameterType="SysSalesTeamperson">
+        update sys_sales_teamperson
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="salesTeamId != null ">sales_Team_id = #{salesTeamId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="entryTime != null ">entry_time = #{entryTime},</if>
+            <if test="endTime != null ">end_time = #{endTime},</if>
+            <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+        </trim>
+        where sales_id = #{salesId}
+    </update>
+
+    <delete id="deleteSysSalesTeampersonById" parameterType="Long">
+        delete from sys_sales_teamperson where sales_id = #{salesId}
+    </delete>
+
+    <delete id="deleteSysSalesTeampersonByIds" parameterType="String">
+        delete from sys_sales_teamperson where sales_id in 
+        <foreach item="salesId" collection="array" open="(" separator="," close=")">
+            #{salesId}
+        </foreach>
+    </delete>
+    
+</mapper>

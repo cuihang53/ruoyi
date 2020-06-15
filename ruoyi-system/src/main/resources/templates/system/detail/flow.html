@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('选择下一个处理人')"/>
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <h4 class="form-header h4">选择下一个处理人</h4>
+    <form class="form-horizontal m" id="form-detail-add" name="form-detail-add">
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">下一个处理人：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <select id="buldingid" name="buldingid" class="form-control m-b"
+                                onchange="selectHouseUtil(this)"
+                                required>
+                            <option selected>== 请选择楼盘 ==</option>
+                            <option th:each="bulding:${buldings}" th:value="${bulding.buildingId}"
+                                    th:text="${bulding.buildingName}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

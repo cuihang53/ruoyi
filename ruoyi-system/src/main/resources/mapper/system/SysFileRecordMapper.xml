@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysFileRecordMapper">
+    
+    <resultMap type="SysFileRecord" id="SysFileRecordResult">
+        <result property="fileRecordId"    column="file_record_id"    />
+        <result property="relevancyType"    column="relevancy_type"    />
+        <result property="saleOrderId"    column="sale_order_id"    />
+        <result property="recordPerson"    column="record_person"    />
+        <result property="recordTime"    column="record_time"    />
+        <result property="recordFileName"    column="record_file_name"    />
+        <result property="remark"    column="remark"    />
+        <result property="unitFile"    column="unit_file"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysFileRecordVo">
+        select file_record_id, relevancy_type, sale_order_id, record_person, record_time, record_file_name, remark, unit_file, create_by, create_time, update_by, update_time from sys_file_record
+    </sql>
+
+    <select id="selectSysFileRecordList" parameterType="SysFileRecord" resultMap="SysFileRecordResult">
+        <include refid="selectSysFileRecordVo"/>
+        <where>  
+            <if test="relevancyType != null  and relevancyType != ''"> and relevancy_type = #{relevancyType}</if>
+            <if test="saleOrderId != null "> and sale_order_id = #{saleOrderId}</if>
+            <if test="recordPerson != null  and recordPerson != ''"> and record_person = #{recordPerson}</if>
+            <if test="recordTime != null "> and record_time = #{recordTime}</if>
+            <if test="recordFileName != null  and recordFileName != ''"> and record_file_name like concat('%', #{recordFileName}, '%')</if>
+            <if test="unitFile != null  and unitFile != ''"> and unit_file = #{unitFile}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysFileRecordById" parameterType="Long" resultMap="SysFileRecordResult">
+        <include refid="selectSysFileRecordVo"/>
+        where file_record_id = #{fileRecordId}
+    </select>
+        
+    <insert id="insertSysFileRecord" parameterType="SysFileRecord" useGeneratedKeys="true" keyProperty="fileRecordId">
+        insert into sys_file_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="relevancyType != null  and relevancyType != ''">relevancy_type,</if>
+            <if test="saleOrderId != null ">sale_order_id,</if>
+            <if test="recordPerson != null  and recordPerson != ''">record_person,</if>
+            <if test="recordTime != null ">record_time,</if>
+            <if test="recordFileName != null  and recordFileName != ''">record_file_name,</if>
+            <if test="remark != null  and remark != ''">remark,</if>
+            <if test="unitFile != null  and unitFile != ''">unit_file,</if>
+            <if test="createBy != null  and createBy != ''">create_by,</if>
+            create_time,
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="relevancyType != null  and relevancyType != ''">#{relevancyType},</if>
+            <if test="saleOrderId != null ">#{saleOrderId},</if>
+            <if test="recordPerson != null  and recordPerson != ''">#{recordPerson},</if>
+            <if test="recordTime != null ">#{recordTime},</if>
+            <if test="recordFileName != null  and recordFileName != ''">#{recordFileName},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="unitFile != null  and unitFile != ''">#{unitFile},</if>
+            <if test="createBy != null  and createBy != ''">#{createBy},</if>
+            sysdate(),
+         </trim>
+    </insert>
+
+    <update id="updateSysFileRecord" parameterType="SysFileRecord">
+        update sys_file_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="relevancyType != null  and relevancyType != ''">relevancy_type = #{relevancyType},</if>
+            <if test="saleOrderId != null ">sale_order_id = #{saleOrderId},</if>
+            <if test="recordPerson != null  and recordPerson != ''">record_person = #{recordPerson},</if>
+            <if test="recordTime != null ">record_time = #{recordTime},</if>
+            <if test="recordFileName != null  and recordFileName != ''">record_file_name = #{recordFileName},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+            <if test="unitFile != null  and unitFile != ''">unit_file = #{unitFile},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            update_time =  sysdate(),
+        </trim>
+        where file_record_id = #{fileRecordId}
+    </update>
+
+    <delete id="deleteSysFileRecordById" parameterType="Long">
+        delete from sys_file_record where file_record_id = #{fileRecordId}
+    </delete>
+
+    <delete id="deleteSysFileRecordByIds" parameterType="String">
+        delete from sys_file_record where file_record_id in 
+        <foreach item="fileRecordId" collection="array" open="(" separator="," close=")">
+            #{fileRecordId}
+        </foreach>
+    </delete>
+    
+</mapper>

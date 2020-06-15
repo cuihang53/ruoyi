@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysSoParticularsMapper">
+    
+    <resultMap type="SysSoParticulars" id="SysSoParticularsResult">
+        <result property="sysSoParticularsId"    column="sys_so_particulars_id"    />
+        <result property="orderstatus"    column="orderStatus"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="salesDetailId"    column="salesDetailId" />
+        <result property="completionTime"    column="completion_time" />
+    </resultMap>
+
+    <sql id="selectSysSoParticularsVo">
+        select sys_so_particulars_id,completion_time,salesDetailId,orderStatus, remark, create_by, create_time, update_by, update_time from sys_so_particulars
+    </sql>
+
+    <select id="selectSysSoParticularsList" parameterType="SysSoParticulars" resultMap="SysSoParticularsResult">
+        <include refid="selectSysSoParticularsVo"/>
+        <where>  
+            <if test="orderstatus != null  and orderstatus != ''"> and orderStatus = #{orderstatus}</if>
+            <if test="salesDetailId != null  and salesDetailId != ''"> and salesDetailId = #{salesDetailId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysSoParticularsById" parameterType="Long" resultMap="SysSoParticularsResult">
+        <include refid="selectSysSoParticularsVo"/>
+        where sys_so_particulars_id = #{sysSoParticularsId}
+    </select>
+        
+    <insert id="insertSysSoParticulars" parameterType="SysSoParticulars" useGeneratedKeys="true" keyProperty="sysSoParticularsId">
+        insert into sys_so_particulars
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderstatus != null  and orderstatus != ''">orderStatus,</if>
+            <if test="remark != null  and remark != ''">remark,</if>
+            <if test="createBy != null  and createBy != ''">create_by,</if>
+            <if test="salesDetailId != null  and salesDetailId != ''">salesDetailId,</if>
+            <if test="completionTime != null  and completionTime != ''">completion_time,</if>
+            create_time,
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderstatus != null  and orderstatus != ''">#{orderstatus},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="createBy != null  and createBy != ''">#{createBy},</if>
+            <if test="salesDetailId != null  and salesDetailId != ''">#{salesDetailId},</if>
+            <if test="completionTime != null  and completionTime != ''">#{completionTime},</if>
+            sysdate(),
+         </trim>
+    </insert>
+
+    <update id="updateSysSoParticulars" parameterType="SysSoParticulars">
+        update sys_so_particulars
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderstatus != null  and orderstatus != ''">orderStatus = #{orderstatus},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="salesDetailId != null  and salesDetailId != ''">salesDetailId = #{salesDetailId},</if>
+            <if test="completionTime != null  and completionTime != ''">completion_time = #{completionTime},</if>
+            update_time = sysdate(),
+        </trim>
+        where sys_so_particulars_id = #{sysSoParticularsId}
+    </update>
+
+    <delete id="deleteSysSoParticularsById" parameterType="Long">
+        delete from sys_so_particulars where sys_so_particulars_id = #{sysSoParticularsId}
+    </delete>
+
+    <delete id="deleteSysSoParticularsByIds" parameterType="String">
+        delete from sys_so_particulars where sys_so_particulars_id in 
+        <foreach item="sysSoParticularsId" collection="array" open="(" separator="," close=")">
+            #{sysSoParticularsId}
+        </foreach>
+    </delete>
+    
+</mapper>

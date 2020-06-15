@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('导出字段选择')"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <h4 class="form-header h4">导出字段选择</h4>
+    <table>
+        <tr>
+            <td colspan="1"><input type="checkbox" name="checkboxs" onclick="checkAll(this)" ><span style="font-weight: bold;font-size: 15px;">全选</span>
+            </td>
+            <td colspan="4"><input type="checkbox"  name="checkboxs" onclick="defaultTe(this)"><span
+                    style="font-weight: bold;font-size: 15px;">选择默认模板</span>
+                <input  type="hidden" name="checkedNum" id="checkedNum">
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="所属楼盘">所属楼盘</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="所属单元">所属单元</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="关联房号">关联房号</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="建筑面积">建筑面积</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="套内面积">套内面积</td>
+        </tr>
+        <tr>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="实测面积">实测面积</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="类型">类型</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="销售底价">销售底价</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="销售单状态">销售单状态</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="认购人">认购人</td>
+        </tr>
+        <tr>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="认购时间">认购时间</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="认购单价">认购单价</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="认购总价">认购总价</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="认购人联系方式">认购人联系方式</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="签约人">签约人</td>
+        </tr>
+        <tr>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="签合同时间">签合同时间</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="签约人联系方式">签约人联系方式</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="付款方式">付款方式</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="合同单价">合同单价</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="合同总价">合同总价</td>
+        </tr>
+        <tr>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="首付金额">首付金额</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="按揭金额">按揭金额</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="返租金额">返租金额</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="已收首付金额">已收首付金额</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="剩余首付金额">剩余首付金额</td>
+        </tr>
+        <tr>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="已收款金额">已收款金额</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="剩余金额">剩余金额</td>
+            <td style="width: 200px"><input type="checkbox" class="checkOne" name="优惠说明">优惠说明</td>
+        </tr>
+    </table>
+</div>
+<th:block th:include="include :: footer"/>
+<script type="text/javascript">
+    function defaultTe(obj) {
+        if ($(obj).is(':checked')) {
+            $("input[name='remark']").prop("checked", true);
+            $("input[name='buldingid']").prop("checked", true);
+            $("#checkedNum").val("");
+            setVal();
+        } else {
+            $("input[name='remark']").prop("checked", false);
+            $("input[name='buldingid']").prop("checked", false);
+            $("#checkedNum").val("");
+        }
+    }
+    function checkAll(obj) {
+        if ($(obj).is(':checked')) {
+            $(".checkOne").prop("checked", true);
+            setVal();
+        }else{
+            $(".checkOne").prop("checked", false);
+            $("#checkedNum").val("");
+        }
+    }
+    function setVal() {
+        var checkedNum = $("#checkedNum").val();
+        $(".checkOne").each(function () {
+            if ($(this).is(':checked')) {
+                checkedNum += $(this).attr("name") + ",";
+            }
+            $("#checkedNum").val(checkedNum)
+        });
+    }
+
+    $(function(){
+        $(".checkOne").click(function(){
+            $("#checkedNum").val("");
+            setVal();
+        })
+    })
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysHouseUnitMapper">
+
+    <resultMap type="SysHouseUnit" id="SysHouseUnitResult">
+        <result property="houseUnitId" column="house_unit_id"/>
+        <result property="buildingId" column="building_Id"/>
+        <result property="houseUnitName" column="house_unit_name"/>
+        <result property="unitCode" column="unit_code"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <association property="bulding" column="bulding_id" javaType="SysBuilding" resultMap="buldingResult"/>
+    </resultMap>
+
+    <resultMap id="buldingResult" type="SysBuilding">
+        <result property="buildingId" column="building_id"/>
+        <result property="buildingCode" column="building_code"/>
+        <result property="buildingName" column="building_name"/>
+        <result property="buildingType" column="building_type"/>
+    </resultMap>
+
+
+    <sql id="selectSysHouseUnitVo">
+        select u.house_unit_id, u.building_Id,u.unit_code, u.house_unit_name ,b.building_code,b.building_name,b.building_type
+        from sys_house_unit u
+        left join sys_building b on u.building_Id = b.building_id
+    </sql>
+
+    <select id="selectSysHouseUnitByName" parameterType="String" resultMap="SysHouseUnitResult">
+        <include refid="selectSysHouseUnitVo"/>
+        <where>
+            <if test="buildingId != null  and buildingId != ''">and u.building_Id = #{buildingId}</if>
+            <if test="houseUnitName != null  and houseUnitName != ''">and u.house_unit_name = #{houseUnitName}</if>
+        </where>
+    </select>
+
+    <select id="selectSysHouseUnitList" parameterType="SysHouseUnit" resultMap="SysHouseUnitResult">
+        <include refid="selectSysHouseUnitVo"/>
+        <where>
+            <if test="buildingId != null  and buildingId != ''">and u.building_Id = #{buildingId}</if>
+            <if test="bulding != null  and bulding.buildingName!=null and  bulding.buildingName != ''">and
+                b.building_name like concat('%', #{bulding.buildingName}, '%')
+            </if>
+            <if test="houseUnitName != null  and houseUnitName != ''">and u.house_unit_name like concat('%',
+                #{houseUnitName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectSysHouseUnitById" parameterType="Long" resultMap="SysHouseUnitResult">
+        <include refid="selectSysHouseUnitVo"/>
+        where house_unit_id = #{houseUnitId}
+    </select>
+
+    <insert id="insertSysHouseUnit" parameterType="SysHouseUnit" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_house_unit
+        (
+        <if test="buildingId != null  and buildingId != ''">building_Id,</if>
+        <if test="houseUnitName != null  and houseUnitName != ''">house_unit_name,</if>
+        <if test="unitCode != null and unitCode != ''">unit_code,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )
+        values
+        (
+        <if test="buildingId != null  and buildingId != ''">#{buildingId},</if>
+        <if test="houseUnitName != null  and houseUnitName != ''">#{houseUnitName},</if>
+        <if test="unitCode != null  and unitCode != ''">#{unitCode},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+
+    </insert>
+
+    <update id="updateSysHouseUnit" parameterType="SysHouseUnit">
+        update sys_house_unit
+        <set>
+            <if test="buildingId != null  and buildingId != ''">building_Id = #{buildingId},</if>
+            <if test="houseUnitName != null  and houseUnitName != ''">house_unit_name = #{houseUnitName},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where house_unit_id = #{houseUnitId}
+    </update>
+
+    <delete id="deleteSysHouseUnitById" parameterType="Long">
+        delete from sys_house_unit where house_unit_id = #{houseUnitId}
+    </delete>
+
+    <delete id="deleteSysHouseUnitByIds" parameterType="String">
+        delete from sys_house_unit where house_unit_id in
+        <foreach item="houseUnitId" collection="array" open="(" separator="," close=")">
+            #{houseUnitId}
+        </foreach>
+    </delete>
+
+</mapper>

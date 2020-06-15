@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增销售信息录入')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <th:block th:include="include :: select2-css"/>
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <h4 class="form-header h4">销售基本信息</h4>
+    <form class="form-horizontal m" id="form-detail-add" name="form-detail-add">
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">所属楼盘：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <select id="buldingid" name="buldingid" class="form-control m-b"
+                                onchange="selectHouseUtil(this)"
+                                required>
+                            <option selected>== 请选择楼盘 ==</option>
+                            <option th:each="bulding:${buldings}" th:value="${bulding.buildingId}"
+                                    th:text="${bulding.buildingName}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">所属单元：</label>
+                <div class="col-sm-8">
+                    <select id="unit" name="unit" class="form-control m-b" onchange="getHouse(this)" required>
+                        <option selected>== 请选择所在单元 ==</option>
+                        <option th:each="unit:${units}" th:value="${unit.houseUnitId}"
+                                th:text="${unit.houseUnitName}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">关联房号：</label>
+                <div class="col-sm-8">
+                    <select id="houseid" name="houseid" class="form-control" onchange="getArea(this)" required>
+                        <option selected>== 请选择关联房号 ==</option>
+                        <option th:each="house:${houses}" th:value="${house.houseId}"
+                                th:text="${house.houseNumber}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">建筑面积：</label>
+                <div class="col-sm-8">
+                    <input name="area" id="area" class="form-control m-b" type="text" readonly required>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">套内面积：</label>
+                <div class="col-sm-8">
+                    <input name="innerArea" id="innerArea" class="form-control m-b" type="text" readonly required>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">实测面积：</label>
+                <div class="col-sm-8">
+                    <input name="realArea" id="realArea" class="form-control m-b" type="text" readonly required>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">类型：</label>
+                <div class="col-sm-8">
+                    <input name="houseType" id="houseType" class="form-control m-b" type="text" readonly required>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label">销售底价(元)：</label>
+                <div class="col-sm-8">
+                    <input name="salseFloorPrice" placeholder="只能输入小数或整数"
+                           onkeyup="this.value=this.value.replace(/[^\d.]/g,'')" class="form-control m-b" value="0"
+                           type="text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">销售人员</label>
+                <div class="col-sm-8">
+                    <input name="salePerson" id="salePerson" editable="false" placeholder="请选择"
+                           onclick="selectPerson(this)" class="form-control m-b" type="text" required>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label">销售单状态：</label>
+                <div class="col-sm-8">
+                    <input name="orderStatus" id="orderStatus" readonly class="form-control m-b" type="text">
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">认购人：</label>
+                <div class="col-sm-8">
+                    <input name="bookBuyer" class="form-control m-b" type="text" required>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">认购时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <input name="buyertime" placeholder="yyyy-MM-dd" class="form-control m-b"
+                               type="text" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">认购单价(元)：</label>
+                <div class="col-sm-8">
+                    <input name="bookBuyerPrice" id="bookBuyerPrice" value="0" onchange="setAllprice(1)"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           class="form-control m-b" type="text" required>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">认购总价(元)：</label>
+                <div class="col-sm-8">
+                    <input name="bookBuyerAllprice" value="0" id="bookBuyerAllprice" onchange="setAllprice(2)"
+                           class="form-control m-b"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           type="text" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label is-required">认购人联系方式：</label>
+                <div class="col-sm-8">
+                    <input name="bookBuyerPhone" class="form-control m-b" type="text" required>
+                </div>
+            </div>
+            <!-- <div class="col-sm-6">
+                 <label class="col-sm-3 control-label is-required">认购金金额(元)：</label>
+                 <div class="col-sm-8">
+                     <input name="buyerPrice" id="buyerPrice" value="0" class="form-control" type="text"
+                            placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                            onchange="setCollection()" required>
+                 </div>
+             </div>
+             !-->
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">签约人：</label>
+                <div class="col-sm-8">
+                    <input name="finalBuyer" class="form-control m-b" type="text">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">签合同时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <input name="contracttime" class="form-control m-b" placeholder="yyyy-MM-dd"
+                               type="text">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">签约人联系方式：</label>
+                <div class="col-sm-8">
+                    <input name="finalBuyerPhone" id="finalBuyerPhone" class="form-control m-b" type="text">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">付款方式：</label>
+                <div class="col-sm-8">
+                    <select name="payMethod" class="form-control m-b"
+                            th:with="type=${@dict.getType('sys_pay_methods')}">
+                        <option value="">== 请选择付款方式 ==</option>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                th:value="${dict.dictLabel}"
+                        ></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label">合同单价(元)：</label>
+                <div class="col-sm-8">
+                    <input name="contractPrice" value="0" id="contractPrice" onchange="setAllprice(3)"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           class="form-control" type="text">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label">合同总价(元)：</label>
+                <div class="col-sm-8">
+                    <input name="contractAllprice" value="0" id="contractAllprice" onchange="setAllprice(4)"
+                           class="form-control"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           type="text">
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">首付金额(元)：</label>
+                <div class="col-sm-8">
+                    <input name="installmentPrice" id="installmentPrice" value="0" onchange="setMortgagePrice()"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           class="form-control" type="text">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label">按揭金额(元)：</label>
+                <div class="col-sm-8">
+                    <input name="mortgagePrice" value="0" id="mortgagePrice" readonly
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           class="form-control" type="text">
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">返租金额(元)：</label>
+                <div class="col-sm-8">
+                    <input name="rantPrice" id="rantPrice" onchange="setCollection()" value="0"
+                           class="form-control"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           type="text">
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">已收首付金额(元)：</label>
+                <div class="col-sm-8">
+                    <input name="rdInstallmentPrice" id="rdInstallmentPrice" value="0" class="form-control"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           type="text" readonly>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">剩余首付金额(元)：</label>
+                <div class="col-sm-8">
+                    <input name="rmiInstallmentPrice" id="rmiInstallmentPrice" value="0" readonly
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           class="form-control" type="text"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">已收款金额(元)：</label>
+                <div class="col-sm-8">
+                    <input name="collection" id="collection" class="form-control"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           type="text" readonly>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label ">剩余金额(元)：</label>
+                <div class="col-sm-8">
+                    <input name="surplusPrice" id="surplusPrice" class="form-control"
+                           placeholder="只能输入小数或整数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"
+                           type="text" readonly>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label">优惠说明：</label>
+                <div class="col-sm-8">
+                    <textarea name="remark" id="remark" class="form-control m-b"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-3 control-label">附件：</label>
+                <div class="col-sm-8">
+                    <input type="file" multiple="multiple" name="filePath" id="filePath"
+                           style="display: inline-block;height: 30px;width: 450px;">
+                    <a onclick="uploadFile()" style="display: inline-block;">上传</a>
+                    <div id="showFile" name="showFile">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" value="" name="cids" id="cids">
+        <input type="hidden" value="" name="delids" id="delids">
+        <input type="hidden" value="" name="payids" id="payids">
+        <input type="hidden" value="" name="recordids" id="recordids">
+        <input type="hidden" value="" name="fileUtilIds" id="fileUtilIds">
+        <input type="hidden" value="" name="soParticularsIds" id="soParticularsIds">
+    </form>
+
+    <script type="text/javascript">
+        function selectPerson(obj) {
+            layer.open({
+                type: 2,
+                area: ['90%', '90%'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: ctx + "system/dept/selectDeptPerson/" + 100
+                , btn: ['确定', '取消']
+                , yes: function (index, layero) {
+                    var body = layer.getChildFrame('body', index);  //此处我理解的是加载目标页面的内容
+                    $(obj).val(body.find('#userName').val());
+                    layer.close(index);//这块是点击确定关闭这个弹出层
+                }
+            });
+        }
+
+        function setMortgagePrice() {
+            //首付
+            var installmentPrice = $("#installmentPrice").val();
+            //合同总价
+            var contractAllprice = $("#contractAllprice").val();
+            //按揭
+            $("#mortgagePrice").val(contractAllprice - installmentPrice)
+            //已付首付金额
+            var rdInstallmentPrice = $("#rdInstallmentPrice").val();
+            //剩余首付金额
+            $("#rmiInstallmentPrice").val(installmentPrice - rdInstallmentPrice);
+        }
+
+
+        function uploadFile() {
+            if ($('#filePath')[0].files[0] == null) {
+                $.modal.alertWarning("请先选择文件路径");
+                return false;
+            }
+            $("#fileUtilIds").val("");
+            for (var i = 0; i <= $('#filePath')[0].files.length; i++) {
+                var formData = new FormData();
+                formData.append('fileName', $('#filePath')[0].files[i].name);
+                formData.append('fileUtilCode', 'OEDERENTITY');
+                formData.append('file', $('#filePath')[0].files[i]);
+                $.ajax({
+                    url: "/system/util/add",
+                    type: 'post',
+                    cache: false,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (result) {
+                        if ($("#fileUtilIds").val() == '') {
+                            $("#fileUtilIds").val(result.fileUtilId);
+                        } else {
+                            var str = $("#fileUtilIds").val() + "," + result.fileUtilId;
+                            $("#fileUtilIds").val(str);
+                        }
+                        var v = result.filePaths;
+                        if (result.houzhui == "jpg" || result.houzhui == "png" || result.houzhui == "bmp") {
+                            $("#showFile").append("<div>" + result.fileName +
+                                "<img width='30px' height='30px' onclick='lookImg(this)'src=" + result.filePaths + "> " +
+                                "<a onclick=\"downloadFile('" + v + "')\">下载</a>&nbsp;&nbsp;" +
+                                "<a onclick=\"delFile(this,'" + result.fileUtilId + "')\">删除</a>" +
+                                " </div>");
+                        } else {
+                            $("#showFile").append("<div> " + result.fileName +
+                                "<a onclick=\"downloadFile('" + v + "')\">下载</a>&nbsp;&nbsp;" +
+                                "<a onclick=\"delFile(this,'" + result.fileUtilId + "')\">删除</a>" +
+                                "</div>");
+                        }
+                    }
+                });
+            }
+            $("#filePath").val("");
+        }
+
+        function delFile(obj, ids) {
+            if (ids == null || ids == '') {
+                $.modal.alertWarning("请先选择需要删除的文件");
+                return false;
+            }
+            $.ajax({
+                type: "POST",//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: "/system/util/remove/",//url
+                data: {"ids": ids},
+                success: function (result) {
+                    $(obj).parent().remove();
+                },
+                error: function () {
+                    alert("附件删除失败！");
+                }
+            });
+        }
+
+        function lookImg(obj) {
+            var img = "<img src='" + $(obj).attr("src") + "' />";
+            //捕获页
+            layer.open({
+                type: 1,
+                shade: false,
+                title: false, //不显示标题
+                area: ['1000px', '700px'],
+                // area: [img.width + 'px', img.height+'px'],
+                content: img, //捕获的元素，注意：最好该指定的元素要存放在body最外层，否则可能被其它的相对元素所影响
+                cancel: function () {
+                    //layer.msg('捕获就是从页面已经存在的元素上，包裹layer的结构', { time: 5000, icon: 6 });
+                }
+            })
+        }
+
+        function downloadFile(value) {
+            window.location.href = ctx + "common/download/resource?resource=" + value;
+        }
+
+    </script>
+
+    <form id="form-payment-add" name="form-payment-add">
+        <h4 class="form-header h4">收款明细信息</h4>
+        <a class="btn btn-success" onclick="selectPayment()" shiro:hasPermission="system:commission:add">
+            <i class="fa fa-plus"></i> 添加
+        </a>
+        <a class="btn btn-success" onclick="delPayTr()"
+           shiro:hasPermission="system:commission:remove">
+            <i class="fa fa-remove"></i> 删除
+        </a>
+    </form>
+
+    <table id="payment-table" name="payment-table" class="table table-hover">
+        <thead>
+        <tr>
+            <th class="bs-checkbox " style="width: 36px; " data-field="0" tabindex="0">
+                <div class="th-inner "><input type="checkbox" onclick="checkAll(this,2)"></div>
+                <div class="fht-cell"></div>
+            </th>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner">收款类型</div>
+                <div class="fht-cell"></div>
+            </th>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner ">收款金额</div>
+                <div class="fht-cell"></div>
+            </th>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner ">收款时间</div>
+                <div class="fht-cell"></div>
+            </th>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner ">说明</div>
+                <div class="fht-cell"></div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script type="text/javascript">
+        function selectPayment() {
+            layer.open({
+                type: 2,
+                area: ['50%', '90%'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: "/system/details/add/"
+                , btn: ['确定', '取消']
+                , yes: function (index, layero) {
+                    var body = layer.getChildFrame('body', index);  //此处我理解的是加载目标页面的内容
+                    if (body.find('#amount').val() == null || body.find('#amount').val().length == 0) {
+                        body.find('#amount').addClass("form-control m-b error")
+                        return false;
+                    } else if (body.find('#paymentTime').val() == null || body.find('#paymentTime').val().length == 0) {
+                        body.find('#paymentTime').addClass("form-control m-b error")
+                        return false;
+                    }
+
+                    $.ajax({
+                        type: "POST",//方法类型
+                        dataType: "json",//预期服务器返回的数据类型
+                        url: "/system/details/add/",//url
+                        data: {
+                            "paymentType": body.find('#paymentType').val(),
+                            "amount": body.find('#amount').val(),
+                            "paymentTime": body.find('#paymentTime').val(),
+                            "remark": body.find('#remark').val()
+                        },
+                        success: function (result) {
+                            if ($("#payids").val() == '') {
+                                $("#payids").val(result.sysPaymentDetails.paymentId);
+                            } else {
+                                var v = $("#payids").val();
+                                $("#payids").val(v + "," + result.sysPaymentDetails.paymentId)
+                            }
+
+                            if (!(body.find('#paymentType').val() == '银行放款' || body.find('#paymentType').val() == '公积金放款')) {
+                                //已收首付金额赋值
+                                var rdInstallmentPrice = Number($("#rdInstallmentPrice").val());
+                                $("#rdInstallmentPrice").val(rdInstallmentPrice + Number(body.find('#amount').val()))
+                                //剩余首付金额赋值
+                                $("#rmiInstallmentPrice").val($("#installmentPrice").val() - $("#rdInstallmentPrice").val())
+                            }
+                            //已收款金额赋值
+                            var collection = $("#collection").val();
+                            $("#collection").val(Number(collection) + Number(body.find('#amount').val()));
+                            //剩余收款金额赋值
+                            $("#surplusPrice").val($("#contractAllprice").val() - $("#collection").val());
+
+                            $("#payment-table").append(
+                                "<tr>" +
+                                "<td style=''><input data-index='0' value='" + result.sysPaymentDetails.paymentId + "' name='btPaySelectItem' id='btPaySelectItem'  type='checkbox'></td>" +
+                                "<td style=''><input name='paymentType' disabled class=\"form-control\" value='" + body.find('#paymentType').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "<td style=''><input name='amount' disabled class=\"form-control\" value='" + body.find('#amount').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "<td style=''><input disabled class=\"form-control\" value='" + body.find('#paymentTime').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "<td style=''><input disabled class=\"form-control\" value='" + body.find('#remark').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "</tr>");
+
+                        },
+                        error: function () {
+                            alert("收款明细添加失败！");
+                        }
+                    });
+                    layer.close(index);//这块是点击确定关闭这个弹出层
+                }
+            });
+        }
+
+
+        function delPayTr() {
+            var ckbs = $("input[name='btPaySelectItem']:checked");
+            if (ckbs.size() == 0) {
+                alert("要删除指定行，需选中要删除的行！");
+                return;
+            }
+            var spCodesTemp;
+            $(ckbs).each(function (i) {
+                if (0 == i) {
+                    spCodesTemp = $(this).val();
+                } else {
+                    spCodesTemp += ("," + $(this).val());
+                }
+                var tr = $(this).parent().parent();
+                var amount = $(tr).find("input[name='amount']").val();
+                var paymentType = $(tr).find("input[name='paymentType']").val();
+                if (!(paymentType == '银行放款' || paymentType == '公积金放款')) {
+                    //已收首付金额赋值
+                    var rdInstallmentPrice = Number($("#rdInstallmentPrice").val());
+                    $("#rdInstallmentPrice").val(rdInstallmentPrice - amount)
+                    //剩余首付金额赋值
+                    $("#rmiInstallmentPrice").val($("#installmentPrice").val() - $("#rdInstallmentPrice").val())
+                }
+                //已收款金额赋值
+                var collection = $("#collection").val();
+                $("#collection").val(collection - amount);
+                //剩余收款金额赋值
+                $("#surplusPrice").val(Number($("#surplusPrice").val()) + Number(amount));
+                $(this).parent().parent().remove();
+            });
+
+            $.ajax({
+                type: "POST",//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: "/system/details/remove/",//url
+                data: {"ids": spCodesTemp},
+                success: function (result) {
+                },
+                error: function () {
+                    alert("提成明细删除失败！");
+                }
+            });
+            $("#payids").val($("input[ name='btPaySelectItem' ] ").val());
+
+        }
+
+
+    </script>
+    <form id="form-commission-add" name="form-commission-add">
+        <h4 class="form-header h4">提成明细信息</h4>
+        <a class="btn btn-success" onclick="selectC()" shiro:hasPermission="system:commission:add">
+            <i class="fa fa-plus"></i> 添加
+        </a>
+        <a class="btn btn-success" onclick="delTr()"
+           shiro:hasPermission="system:commission:remove">
+            <i class="fa fa-remove"></i> 删除
+        </a>
+
+        <table id="bootstrap-table" class="table table-hover">
+            <thead>
+            <tr>
+                <th class="bs-checkbox " style="width: 36px; " data-field="0" tabindex="0">
+                    <div class="th-inner "><input name="btSelectAll" onclick='checkAll(this,1)' type="checkbox"></div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner">岗位</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">提点</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">对应人员</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">完成任务发放比例</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">回款发放比例</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">回款提成发放时间</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">交房发放比例</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">交房提成发放时间</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">备注</div>
+                    <div class="fht-cell"></div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </form>
+
+    <form id="form-soParticulars-add" name="form-commission-add">
+        <h4 class="form-header h4">订单进度明细信息</h4>
+        <a class="btn btn-success" onclick="addSoParticulars()" shiro:hasPermission="system:commission:add">
+            <i class="fa fa-plus"></i> 添加
+        </a>
+        <table id="soParticulars-table" class="table table-hover">
+            <thead>
+            <tr>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner">进度状态</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">说明</div>
+                    <div class="fht-cell"></div>
+                </th>
+                <th style="" data-field="" tabindex="0">
+                    <div class="th-inner ">完成时间</div>
+                    <div class="fht-cell"></div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </form>
+
+    <form id="form-record-add" name="form-payment-add">
+        <h4 class="form-header h4">资料领取记录</h4>
+        <a class="btn btn-success" onclick="addRecord()" shiro:hasPermission="system:commission:add">
+            <i class="fa fa-plus"></i> 添加
+        </a>
+        <a class="btn btn-success" onclick="delRecord()"
+           shiro:hasPermission="system:commission:remove">
+            <i class="fa fa-remove"></i> 删除
+        </a>
+    </form>
+    <table id="record-table" name="record-table" class="table table-hover">
+        <thead>
+        <tr>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner"></div>
+                <div class="fht-cell"></div>
+            </th>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner">文件名称</div>
+                <div class="fht-cell"></div>
+            </th>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner ">领取人</div>
+                <div class="fht-cell"></div>
+            </th>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner ">领取时间</div>
+                <div class="fht-cell"></div>
+            </th>
+            <th style="" data-field="" tabindex="0">
+                <div class="th-inner ">说明</div>
+                <div class="fht-cell"></div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        function addRecord() {
+            layer.open({
+                type: 2,
+                area: ['50%', '90%'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: "/system/record/add/"
+                , btn: ['确定', '取消']
+                , yes: function (index, layero) {
+                    var body = layer.getChildFrame('body', index);  //此处我理解的是加载目标页面的内容
+                    if (body.find('#recordFileName').val() == null || body.find('#recordFileName').val().length == 0) {
+                        body.find('#recordFileName').addClass("form-control m-b error")
+                        return false;
+                    } else if (body.find('#recordPerson').val() == null || body.find('#recordPerson').val().length == 0) {
+                        body.find('#recordPerson').addClass("form-control m-b error")
+                        return false;
+                    } else if (body.find('#recordTime').val() == null || body.find('#recordTime').val().length == 0) {
+                        body.find('#recordTime').addClass("form-control m-b error")
+                        return false;
+                    }
+                    $.ajax({
+                        type: "POST",//方法类型
+                        dataType: "json",//预期服务器返回的数据类型
+                        url: "/system/record/add/",//url
+                        data: {
+                            "recordPerson": body.find('#recordPerson').val(),
+                            "recordTime": body.find('#recordTime').val(),
+                            "recordFileName": body.find('#recordFileName').val(),
+                            "remark": body.find('#remark').val()
+                        },
+                        success: function (result) {
+                            if ($("#recordids").val() == '') {
+                                $("#recordids").val(result.sysFileRecord.fileRecordId);
+                            } else {
+                                var v = $("#recordids").val();
+                                $("#recordids").val(v + "," + result.sysFileRecord.fileRecordId)
+                            }
+                            $("#record-table").append(
+                                "<tr>" +
+                                "<td style=''><input data-index='0' value='" + result.sysFileRecord.fileRecordId + "' name='btRecordSelectItem' id='btRecordSelectItem'  type='checkbox'></td>" +
+                                "<td style=''><input name='recordFileName' disabled class=\"form-control\" value='" + body.find('#recordFileName').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "<td style=''><input name='recordPerson' disabled class=\"form-control\" value='" + body.find('#recordPerson').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "<td style=''><input disabled class=\"form-control\" value='" + body.find('#recordTime').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "<td style=''><input disabled class=\"form-control\" value='" + body.find('#remark').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "</tr>");
+                        },
+                        error: function () {
+                            alert("资料领取记录添加失败！");
+                        }
+                    });
+                    layer.close(index);//这块是点击确定关闭这个弹出层
+                }
+            });
+
+        }
+
+        function delRecord() {
+            var ckbs = $("input[name='btRecordSelectItem']:checked");
+            if (ckbs.size() == 0) {
+                alert("要删除指定行，需选中要删除的行！");
+                return;
+            }
+            var spCodesTemp;
+            $("#recordids").val("");
+            $(ckbs).each(function (i) {
+                if (0 == i) {
+                    spCodesTemp = $(this).val();
+                } else {
+                    spCodesTemp += ("," + $(this).val());
+                }
+                $("#recordids").val(spCodesTemp);
+                $(this).parent().parent().remove();
+            });
+            $.ajax({
+                type: "POST",//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: "/system/record/remove/",//url
+                data: {"ids": $("#recordids").val()},
+                success: function (result) {
+
+                },
+                error: function () {
+                    alert("资料记录删除失败！");
+                }
+            });
+            $("#recordids").val($(" input[ name='btRecordSelectItem' ] ").val());
+        }
+
+        function checkAll(obj, type) {
+            var status = $(obj).prop("checked");
+            if (type == 1) {
+                if (status == true) {
+                    $("input[name='btSelectItem']").prop("checked", true);
+                } else {
+                    $("input[name='btSelectItem']").prop("checked", false);
+                }
+            } else if (type == 2) {
+                if (status == true) {
+                    $("input[name='btPaySelectItem']").prop("checked", true);
+                } else {
+                    $("input[name='btPaySelectItem']").prop("checked", false);
+                }
+            }
+
+        }
+
+        function addSoParticulars() {
+            layer.open({
+                type: 2,
+                area: ['50%', '90%'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: "/system/particulars/add/"
+                , btn: ['确定', '取消']
+                , yes: function (index, layero) {
+                    var body = layer.getChildFrame('body', index);  //此处我理解的是加载目标页面的内容
+                    var completionTime = body.find('#completionTime').val()
+                    if (completionTime == null || completionTime == '') {
+                        body.find('#completionTime').addClass("form-control m-b error")
+                        return false;
+                    }
+                    $.ajax({
+                        type: "POST",//方法类型
+                        dataType: "json",//预期服务器返回的数据类型
+                        url: "/system/particulars/add/",//url
+                        data: {
+                            "orderstatus": body.find('#orderstatus').val(),
+                            "completionTime": completionTime,
+                            "remark": body.find('#remark').val()
+                        },
+                        success: function (result) {
+                            if ($("#soParticularsIds").val() == '') {
+                                $("#soParticularsIds").val(result.sysSoParticulars.sysSoParticularsId);
+                            } else {
+                                var v = $("#soParticularsIds").val();
+                                $("#soParticularsIds").val(v + "," + result.sysSoParticulars.sysSoParticularsId)
+                            }
+                            $("#soParticulars-table").append(
+                                "<tr>" +
+                                "<td style=''><input disabled class=\"form-control\" value='" + result.sysSoParticulars.orderstatus + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "<td style=''><input disabled class=\"form-control\" value='" + result.sysSoParticulars.remark + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "<td style=''><input disabled class=\"form-control\" value='" + result.sysSoParticulars.completionTime + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                                "</tr>");
+
+                            $("#orderStatus").val(result.sysSoParticulars.orderstatus);
+                        },
+
+                        error: function () {
+                            alert("订单进度明细添加失败！");
+                        }
+                    })
+                    ;
+                    layer.close(index);//这块是点击确定关闭这个弹出层
+                }
+            });
+        }
+
+    </script>
+
+</div>
+
+<h4 class="form-header h4">流程信息</h4>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="form-group">
+            <label class="col-sm-4 control-label ">下一步处理人：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input onclick="selectPerson(this)" id="nextUserName" name="nextUserName" type="text"
+                           placeholder="请选择下一步处理人" class="form-control">
+                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    <input type="hidden" id="nextUser" name="nextUser">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-sm-offset-5 col-sm-10">
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler(0)"><i class="fa fa-check"></i>保 存
+        </button>&nbsp;
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler(1)"><i class="fa fa-check"></i>提交
+        </button>&nbsp;
+        <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭
+        </button>
+    </div>
+</div>
+
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<th:block th:include="include :: select2-js"/>
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<script type="text/javascript">
+
+    var prefix = ctx + "system/detail"
+    $("#form-detail-add").validate({
+        focusCleanup: true
+    });
+    //
+    // function submitHandler() {
+    //     if ($.validate.form()) {
+    //         $.operate.save(prefix + "/add", $('#form-detail-add').serialize());
+    //     }
+    // }
+
+    function submitHandler(optionStatus) {
+        var nextUser = $("#nextUserName").val();
+        var nextUserId = $("#nextUser").val();
+        if(optionStatus==1){
+            if (nextUser == null || nextUser.length==0 || nextUserId == null || nextUserId.length == 0) {
+                $("#nextUserName").addClass("form-control m-b error")
+                return false;
+            }
+        }
+        $.ajax({
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: prefix + "/add",//url
+            data: $('#form-detail-add').serialize(),
+            success: function (result) {
+                var salesDetailId = result.sysSalesDetail.salesDetailId;
+                //当前处理人
+                var handleruser = $("#nextUser").val();
+                var dealLink = ""
+                if(optionStatus==1){
+                    dealLink = "/system/detail/view/{"+salesDetailId+"}"
+                }
+                addFlowSure(handleruser,salesDetailId,optionStatus,dealLink);
+            },
+            error: function () {
+                alert("error！");
+            }
+        })
+    }
+
+
+    function addFlowSure(handleruser,salesDetailId,optionStatus,dealLink) {
+        $.ajax({
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "/system/flow/add",//url
+            data: {"typeId":salesDetailId, "handleruser": handleruser, "type": "SALESORDER","optionStatus":optionStatus,"dealLink":dealLink},
+            success: function (result) {
+                window.location.href = "/system/detail/";
+            },
+            error: function () {
+                alert("error！");
+            }
+        })
+    }
+
+
+    function val(s) {
+        var v = s.value;
+        if (!/^[0-9]+([.]{1}[0-9]{1,9})?%$/.test(v)) {
+            alert('只能输入小数位数最多为九位的数字，并只能以%结尾道');
+            return s.value = '';
+        } else {
+            return true;
+        }
+    }
+
+    function setCollection() {
+        var count = 0;
+        var countAll = 0;
+        //循环找出除返租金额外已交的所有首付款
+        $('#payment-table tr').each(function (i) {                   // 遍历 tr
+            var paymentType = $(this).find("input[name='paymentType']").val()
+            var amount = Number($(this).find("input[name='amount']").val());
+            if (paymentType != null) {
+                countAll = Number(countAll) + Number(amount);
+                if (!(paymentType == '银行放款' || paymentType == '公积金放款')) {
+                    count = Number(count) + Number(amount);
+                }
+            }
+        });
+        //返租金额
+        var rantPrice = Number($("#rantPrice").val());
+        //首付分期金额
+        var installmentPrice = Number($("#installmentPrice").val());
+        //已收首付金额
+        $("#rdInstallmentPrice").val(count + rantPrice);
+        //剩余首付金额
+        $("#rmiInstallmentPrice").val(installmentPrice - $("#rdInstallmentPrice").val());
+        //已收款金额赋值
+        $("#collection").val(Number(countAll) + Number(rantPrice));
+        //剩余收款金额赋值
+        $("#surplusPrice").val($("#contractAllprice").val() - $("#collection").val());
+
+    }
+
+    function setSurplusPrice() {
+        //合同总价
+        var contractAllprice = $("#contractAllprice").val();
+        //已收款金额
+        var collection = $("#collection").val();
+        //剩余金额
+        $("#surplusPrice").val(contractAllprice - collection);
+        //首付金额
+        var installmentPrice = $("#installmentPrice").val();
+        //按揭金额
+        $("#mortgagePrice").val(contractAllprice - installmentPrice);
+
+    }
+
+    function selectPerson(obj) {
+        layer.open({
+            type: 2,
+            area: ['90%', '90%'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: ctx + "system/dept/selectDeptPerson/" + 100
+            , btn: ['确定', '取消']
+            , yes: function (index, layero) {
+                var body = layer.getChildFrame('body', index);  //此处我理解的是加载目标页面的内容
+                $(obj).text(body.find('#userId').val());
+                $(obj).val(body.find('#userName').val());
+                $("#nextUser").val(body.find('#userId').val());
+                if($("#nextUser").val()!=null &&  $("#nextUser").val().length>0){
+                    $("#nextUserName").removeClass()
+                    $("#nextUserName").addClass("form-control")
+                }
+
+                layer.close(index);//这块是点击确定关闭这个弹出层
+            }
+        });
+    }
+
+    function selectHouseUtil(obj) {
+        $.ajax({
+            type: "POST",
+            url: ctx + "system/unit/selectHouseUtil",
+            data: {"buldingId": $(obj).val()},
+            datatype: 'json',
+            success: function (result) {//res后台返回的数据
+                $("#unit").empty();
+                if (result.posts != null) {
+                    $("#unit").append("<option selected>== 请选择所在单元 ==</option>");
+                    for (var i = 0; i < result.posts.length; i++) {//循环遍历数据
+                        var post = result.posts[i];
+                        $("#unit").append("<option value='" + post.houseUnitId + "'>" + post.houseUnitName + "</option>");
+                    }
+                } else {
+                    $("#unit").append("<option>暂无数据</option>");
+                }
+
+            }
+        });
+    }
+
+    function getHouse(obj) {
+        $.ajax({
+            type: "POST",
+            url: ctx + "system/house/selectHouseByUnit",
+            data: {"unitId": $(obj).val()},
+            datatype: 'json',
+            success: function (result) {//res后台返回的数据
+                $("#houseid").empty();
+                if (result.posts != null) {
+                    $("#houseid").append(" <option selected>== 请选择关联房号 ==</option>");
+                    for (var i = 0; i < result.posts.length; i++) {//循环遍历数据
+                        var post = result.posts[i];
+                        $("#houseid").append("<option value='" + post.houseId + "'>" + post.houseNumber + "</option>");
+                    }
+                } else {
+                    $("#houseid").append("<option>暂无数据</option>");
+                }
+
+            }
+        });
+
+    }
+
+    function getArea(obj) {
+        $.ajax({
+            type: "POST",
+            url: ctx + "system/house/selectById",
+            data: {"houseId": $(obj).val()},
+            datatype: 'json',
+            success: function (result) {//res后台返回的数据
+                if (result.posts != null) {
+                    $("#area").val(result.posts.area);
+                    $("#innerArea").val(result.posts.innerArea);
+                    $("#realArea").val(result.posts.realArea);
+                    var area = result.posts.area;
+                    var bookBuyerPrice = $("#bookBuyerPrice").val();
+                    var contractPrice = $("#contractPrice").val();
+                    //认购总价赋值
+
+                    $("#bookBuyerAllprice").val(Math.round((area * bookBuyerPrice) * 100) / 100);
+                    //合同总价赋值
+                    $("#contractAllprice").val(Math.round((area * contractPrice) * 100) / 100);
+                    //剩余金额赋值
+                    $("#surplusPrice").val($("#contractAllprice").val() - $("#buyerPrice").val() - $("#collection").val())
+                    $("#houseType").val(result.posts.buildingType);
+
+                    //首付金额
+                    var installmentPrice = $("#installmentPrice").val();
+                    //按揭金额
+                    var mortgagePrice = $("#contractAllprice").val() - installmentPrice;
+                    $("#mortgagePrice").val(mortgagePrice);
+                    //剩余金额
+                    $("#surplusPrice").val($("#contractAllprice").val() - $("#collection").val())
+                } else {
+                    $("#area").val(0);
+                    $("#innerArea").val(0);
+                    $("#realArea").val(0);
+                    $("#houseType").val('');
+                }
+
+            }
+        });
+
+    }
+
+
+
+
+
+    $("input[name='buyertime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+
+    $("input[name='contracttime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+
+    $("input[name='commissionTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+
+    $("input[name='creatTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+
+
+    function setAllprice(typeNo) {
+        var area = $("#area").val();
+        if (typeNo == 1) {
+            var bookBuyerPrice = $("#bookBuyerPrice").val();
+            $("#bookBuyerAllprice").val(Math.round((bookBuyerPrice * area) * 100) / 100)
+        } else if (typeNo == 2) {
+            var bookBuyerAllprice = $("#bookBuyerAllprice").val();
+            $("#bookBuyerPrice").val(Math.round((bookBuyerAllprice / area) * 100) / 100)
+        } else if (typeNo == 3) {
+            var contractPrice = $("#contractPrice").val();
+            $("#contractAllprice").val(Math.round((contractPrice * area) * 100) / 100)
+            setSurplusPrice();
+        } else if (typeNo == 4) {
+            var contractAllprice = $("#contractAllprice").val();
+            $("#contractPrice").val(Math.round((contractAllprice / area) * 100) / 100)
+            setSurplusPrice();
+        }
+
+    }
+
+    function selectC() {
+        layer.open({
+            type: 2,
+            area: ['50%', '90%'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: "/system/commission/add/"
+            , btn: ['确定', '取消']
+            , yes: function (index, layero) {
+                var body = layer.getChildFrame('body', index);  //此处我理解的是加载目标页面的内容
+                var completeProp = body.find('#remind').val();//完成任务发放比例
+                var dibProportion = body.find('#dibProportion').val();//回款发放比例
+                var roomProportion = body.find('#roomProportion').val();//交房发放比例
+
+                if (body.find('#postId').val() == null || body.find('#postId').val().length == 0) {
+                    body.find('#postId').addClass("form-control m-b error")
+                    return false;
+                } else if (body.find('#remind').val() == null || body.find('#remind').val().length == 0) {
+                    body.find('#remind').addClass("form-control m-b error")
+                    return false;
+                } else if (body.find('#userId').val() == null || body.find('#userId').val().length == 0) {
+                    body.find('#userName').addClass("form-control m-b error")
+                    return false;
+                } else if (completeProp != null && dibProportion != null && roomProportion != null) {
+                    if (Number(completeProp) + Number(dibProportion) + Number(roomProportion) > 100) {
+                        alert("发放比例之和不能高于100%！");
+                        return false;
+                    }
+                }
+                $.ajax({
+                    type: "POST",//方法类型
+                    dataType: "json",//预期服务器返回的数据类型
+                    url: "/system/commission/addSave/",//url
+                    data: {
+                        "postId": body.find('#postId').val(),
+                        "remind": body.find('#remind').val(),
+                        "userId": body.find('#userId').val(),
+                        "dibProportion": body.find('#dibProportion').val(),
+                        "roomProportion": body.find('#roomProportion').val(),
+                        "completeProp": body.find('#completeProp').val(),
+                        "dibTime": Date.parse(body.find('#dibTime').val()),
+                        "roomPrpTime": Date.parse(body.find('#roomPrpTime').val()),
+                        "remark": body.find('#remark').val()
+                    },
+                    success: function (result) {
+                        if ($("#cids").val() == '') {
+                            $("#cids").val(result.sysCommission.commissionId);
+                        } else {
+                            var v = $("#cids").val();
+                            $("#cids").val(v + "," + result.sysCommission.commissionId)
+                        }
+                        $("#bootstrap-table").append(
+                            "<tr>" +
+                            "<td style=''><input data-index='0' value='" + result.sysCommission.commissionId + "' name='btSelectItem' id='btSelectItem'  type='checkbox'></td>" +
+                            "<td style=''><input disabled class=\"form-control\" value='" + body.find('#postName').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            "<td style=''><input disabled class=\"form-control\" value='" + body.find('#remind').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            "<td style=''><input disabled class=\"form-control\" value='" + body.find('#userName').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            "<td style=''><input disabled class=\"form-control\" value='" + body.find('#completeProp').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            " <td style=''><input disabled class=\"form-control\" value='" + body.find('#dibProportion').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            "<td style=''><input disabled class=\"form-control\" value='" + body.find('#dibTime').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            " <td style=''><input disabled class=\"form-control\" value='" + body.find('#roomProportion').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            "<td style=''><input disabled class=\"form-control\" value='" + body.find('#roomPrpTime').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            "<td style=''><input class=\"form-control\" disabled value='" + body.find('#remark').val() + "' style='border-color:lightgray;width: 150px;height: 35px;'></td>" +
+                            "</tr>");
+                    },
+                    error: function () {
+                        alert("提成明细添加失败！");
+                    }
+                });
+                layer.close(index);//这块是点击确定关闭这个弹出层
+            }
+        });
+    }
+
+    function delTr() {
+        var ckbs = $("input[name='btSelectItem']:checked");
+        if (ckbs.size() == 0) {
+            alert("要删除指定行，需选中要删除的行！");
+            return;
+        }
+        var spCodesTemp;
+        $("#delids").val("");
+        $(ckbs).each(function (i) {
+            if (0 == i) {
+                spCodesTemp = $(this).val();
+            } else {
+                spCodesTemp += ("," + $(this).val());
+            }
+            $("#delids").val(spCodesTemp);
+            $(this).parent().parent().remove();
+        });
+        $.ajax({
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "/system/commission/remove/",//url
+            data: {"ids": $("#delids").val()},
+            success: function (result) {
+
+            },
+            error: function () {
+                alert("提成明细删除失败！");
+            }
+        });
+        $("#cids").val($(" input[ name='btSelectItem' ] ").val());
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('销售信息录入列表')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <th:block th:include="include :: select2-css"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form name="formId" id="formId">
+                <div class="row">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>&nbsp;&nbsp;&nbsp;&nbsp;所属楼盘：</label>
+                                <input type="text" name="bulding.buildingName"/>
+                            </li>
+                            <li>
+                                <label>房号：</label>
+                                <input type="text" name="house.houseNumber"/>
+                            </li>
+                            <li>
+                                <label>状态：</label>
+                                <select name="orderStatus"
+                                        th:with="type=${@dict.getType('sys_pay_status')}">
+                                    <option value="">== 请选择销售单状态 ==</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                            th:value="${dict.dictLabel}"
+                                    ></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>认购人：</label>
+                                <input type="text" name="bookBuyer"/>
+                            </li>
+                            <li class="select-time">
+                                <label>认购时间：</label>
+                                <input type="text" class="time-input" id="beginBuyertime" placeholder="开始时间"
+                                       name="params[beginBuyertime]"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endBuyertime" placeholder="结束时间"
+                                       name="params[endBuyertime]"/>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>&nbsp;&nbsp;&nbsp;&nbsp;签约人：</label>
+                                <input type="text" name="finalBuyer"/>
+                            </li>
+                            <li class="select-time">
+                                <label>签合同时间：</label>
+                                <input type="text" class="time-input" id="beginContracttime" placeholder="开始时间"
+                                       name="params[beginContracttime]"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endContracttime" placeholder="结束时间"
+                                       name="params[endContracttime]"/>
+                            </li>
+                            <li class="select-time">
+                                <label>房款结清时间：</label>
+                                <input type="text" class="time-input" id="beginPriceEndTime" placeholder="开始时间"
+                                       name="params[beginPriceEndTime]"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endPriceEndTime" placeholder="结束时间"
+                                       name="params[endPriceEndTime]"/>
+                            </li>
+                            <li class="select-time">
+                                <label>创建时间：</label>
+                                <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                       name="params[beginCreatTime]"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                       name="params[endCreatTime]"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                        class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                        class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <input type="hidden" id="checkedNum" name="checkedNum">
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.addTab()" shiro:hasPermission="system:detail:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()"
+               shiro:hasPermission="system:detail:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="system:detail:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <!--  <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:detail:export">
+                  <i class="fa fa-download"></i> 导出
+              </a>
+              !-->
+            <a class="btn btn-warning" onclick="exportExcel()">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<!--<input type="text" name="loginUser" id="loginUser" th:value="${user.userId}">-->
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('system:detail:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('system:detail:remove')}]];
+    var prefix = ctx + "system/detail";
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "销售信息录入",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'salesDetailId',
+                    title: 'id',
+                    visible: false
+                },
+                {
+                    field: 'bulding.buildingName',
+                    title: '关联楼盘'
+                },
+                {
+                    field: 'house.houseNumber',
+                    title: '关联房号'
+                },
+                {
+                    field: 'salePerson',
+                    title: '销售人员'
+                },
+                {
+                    field: 'bookBuyer',
+                    title: '认购人'
+                },
+                {
+                    field: 'buyertime',
+                    title: '认购时间',
+                    sortable: true
+                },
+                {
+                    field: 'bookBuyerPrice',
+                    title: '认购单价'
+                },
+                {
+                    field: 'bookBuyerAllprice',
+                    title: '认购总价'
+                },
+                {
+                    field: 'contracttime',
+                    title: '签合同时间',
+                    sortable: true
+                },
+                {
+                    field: 'finalBuyer',
+                    title: '签约人'
+                },
+                {
+                    field: 'contractPrice',
+                    title: '合同单价'
+                },
+                {
+                    field: 'contractAllprice',
+                    title: '合同总价'
+                },
+                {
+                    field: 'payMethod',
+                    title: '付款方式'
+                },
+                {
+                    field: 'collection',
+                    title: '已收款金额'
+                },
+                {
+                    field: 'surplusPrice',
+                    title: '剩余金额'
+                },
+                {
+                    field: 'remark',
+                    title: '优惠说明'
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间',
+                    sortable: true
+                },
+                {
+                    field: 'createBy',
+                    title: '创建人'
+                },
+                {
+                    title: '状态',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return statusTools(row);
+                    }
+
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        // var longinUser = $("#loginUser").val()
+                        // if(row.flow.status!=2 && row.flow.handleruser == longinUser){
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.editTab(\'' + row.salesDetailId + '\')"><i class="fa fa-edit"></i>编辑</a><br>');
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.salesDetailId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        // }
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+
+    /* 用户状态显示 */
+    function statusTools(row) {
+        if (row.flow.status == 0) {
+            return '<span style=\"font-weight: bold;color: green ;\">保存</span>';
+        } else if (row.flow.status == 1) {
+            return '流程中';
+        } else if (row.flow.status == 2) {
+            return '已结束';
+        }
+    }
+
+    function exportExcel() {
+        layer.open({
+            type: 2,
+            area: ['50%', '90%'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: "/system/detail/export/"
+            , btn: ['确定', '取消']
+            , yes: function (index, layero) {
+                var body = layer.getChildFrame('body', index);  //此处我理解的是加载目标页面的内容
+                if (body.find('#checkedNum').val() != null || body.find('#checkedNum').val().length > 0) {
+                    $("#checkedNum").val(body.find('#checkedNum').val());
+                    $.ajax({
+                        type: "POST",//方法类型
+                        dataType: "json",//预期服务器返回的数据类型
+                        url: "/system/detail/exportSure/",//url
+                        data: $('#formId').serialize(),
+                        // data: {
+                        //     "checkedNum": body.find('#checkedNum').val(),
+                        // },
+                        success: function (result) {
+                            downloadFile(result.msg)
+                        }
+                    });
+                }
+                layer.close(index);//这块是点击确定关闭这个弹出层
+            }
+        });
+    }
+
+    function downloadFile(value) {
+        window.location.href = ctx + "common/download?fileName=" + value + "&delete=" + true;
+    }
+
+</script>
+</body>
+</html>

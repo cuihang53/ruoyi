@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysCustomerMapper">
+    
+    <resultMap type="SysCustomer" id="SysCustomerResult">
+        <result property="customerId"    column="customer_id"    />
+        <result property="cName"    column="c_name"    />
+        <result property="cSex"    column="c_sex"    />
+        <result property="cPhone"    column="c_phone"    />
+    </resultMap>
+
+    <sql id="selectSysCustomerVo">
+        select customer_id, c_name, c_sex, c_phone from sys_customer
+    </sql>
+
+    <select id="selectSysCustomerList" parameterType="SysCustomer" resultMap="SysCustomerResult">
+        <include refid="selectSysCustomerVo"/>
+        <where>  
+            <if test="cName != null  and cName != ''"> and c_name like concat('%', #{cName}, '%')</if>
+            <if test="cSex != null  and cSex != ''"> and c_sex = #{cSex}</if>
+            <if test="cPhone != null  and cPhone != ''"> and c_phone = #{cPhone}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysCustomerById" parameterType="Long" resultMap="SysCustomerResult">
+        <include refid="selectSysCustomerVo"/>
+        where customer_id = #{customerId}
+    </select>
+        
+    <insert id="insertSysCustomer" parameterType="SysCustomer" useGeneratedKeys="true" keyProperty="customerId">
+        insert into sys_customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cName != null  and cName != ''">c_name,</if>
+            <if test="cSex != null  and cSex != ''">c_sex,</if>
+            <if test="cPhone != null  and cPhone != ''">c_phone,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cName != null  and cName != ''">#{cName},</if>
+            <if test="cSex != null  and cSex != ''">#{cSex},</if>
+            <if test="cPhone != null  and cPhone != ''">#{cPhone},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysCustomer" parameterType="SysCustomer">
+        update sys_customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cName != null  and cName != ''">c_name = #{cName},</if>
+            <if test="cSex != null  and cSex != ''">c_sex = #{cSex},</if>
+            <if test="cPhone != null  and cPhone != ''">c_phone = #{cPhone},</if>
+        </trim>
+        where customer_id = #{customerId}
+    </update>
+
+    <delete id="deleteSysCustomerById" parameterType="Long">
+        delete from sys_customer where customer_id = #{customerId}
+    </delete>
+
+    <delete id="deleteSysCustomerByIds" parameterType="String">
+        delete from sys_customer where customer_id in 
+        <foreach item="customerId" collection="array" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
+    </delete>
+    
+</mapper>

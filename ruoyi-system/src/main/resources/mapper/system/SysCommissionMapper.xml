@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysCommissionMapper">
+
+    <resultMap type="SysCommission" id="SysCommissionResult">
+        <result property="commissionId" column="commission_id"/>
+        <result property="salesDetailId" column="sales_detail_id"/>
+        <result property="houseid" column="house_id"/>
+        <result property="postId" column="post_id"/>
+        <result property="remind" column="remind"/>
+        <result property="userId" column="user_id"/>
+        <result property="completeProp" column="complete_prop"/>
+        <result property="dibProportion" column="dib_proportion"/>
+        <result property="dibTime" column="dib_time"/>
+        <result property="roomProportion" column="room_proportion"/>
+        <result property="roomPrpTime" column="room_prp_time"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <association property="post" column="post_id" javaType="SysPost" resultMap="PostResult"/>
+        <association property="user" column="user_id" javaType="SysUser" resultMap="UserResult"/>
+    </resultMap>
+
+    <resultMap id="PostResult" type="SysPost">
+        <id property="postId" column="post_id"/>
+        <result property="postCode" column="post_code"/>
+        <result property="postName" column="post_name"/>
+        <result property="postSort" column="post_sort"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <resultMap id="UserResult" type="SysUser">
+        <id property="userId" column="user_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="loginName" column="login_name"/>
+        <result property="userName" column="user_name"/>
+        <result property="userType" column="user_type"/>
+        <result property="email" column="email"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="loginIp" column="login_ip"/>
+        <result property="loginDate" column="login_date"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+
+    <sql id="selectSysCommissionVo">
+        select c.commission_id,  c.sales_detail_id,c.complete_prop,c.dib_time,c.room_prp_time, c.house_id,  c.post_id,
+         c.remind,  c.user_id,  c.dib_proportion,c.room_proportion,  c.remark,
+        c.update_time,c.update_by,c.create_time,c.create_by,u.login_name, u.user_name, u.user_type, u.email, u.avatar, u.phonenumber,
+        p.post_id,  p.post_code,  p.post_name
+        from sys_commission c
+        left join  sys_user u on u.user_id = c.user_id
+        left join  sys_post p on p.post_id = c.post_id
+    </sql>
+
+    <select id="selectSysCommissionList" parameterType="SysCommission" resultMap="SysCommissionResult">
+        <include refid="selectSysCommissionVo"/>
+        <where>
+            <if test="salesDetailId != null ">and sales_detail_id = #{salesDetailId}</if>
+            <if test="houseid != null ">and house_id = #{houseid}</if>
+            <if test="postId != null ">and post_id = #{postId}</if>
+            <if test="remind != null ">and remind = #{remind}</if>
+          <!--  <if test="userId != null ">and user_id = #{userId}</if>-->
+            <if test="dibProportion != null ">and dib_proportion = #{dibProportion}</if>
+            <if test="roomProportion != null ">and room_proportion = #{roomProportion}</if>
+        </where>
+    </select>
+
+    <select id="selectByorderId" parameterType="SysCommission" resultMap="SysCommissionResult">
+        <include refid="selectSysCommissionVo"/>
+        where sales_detail_id = #{salesDetailId}
+    </select>
+
+
+
+    <select id="selectSysCommissionById" parameterType="Long" resultMap="SysCommissionResult">
+        <include refid="selectSysCommissionVo"/>
+        where commission_id = #{commissionId}
+    </select>
+
+    <insert id="insertSysCommission" parameterType="SysCommission" useGeneratedKeys="true" keyProperty="commissionId">
+        insert into sys_commission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="salesDetailId != null ">sales_detail_id,</if>
+            <if test="houseid != null ">house_id,</if>
+            <if test="postId != null ">post_id,</if>
+            <if test="remind != null ">remind,</if>
+            <if test="userId != null ">user_id,</if>
+            <if test="dibProportion != null ">dib_proportion,</if>
+            <if test="roomProportion != null ">room_proportion,</if>
+            <if test="remark != null  and remark != ''">remark,</if>
+            <if test="completeProp != null  and completeProp != ''">complete_prop,</if>
+            <if test="dibTime != null  and dibTime != ''">dib_time,</if>
+            <if test="roomPrpTime != null  and roomPrpTime != ''">room_prp_time,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="salesDetailId != null ">#{salesDetailId},</if>
+            <if test="houseid != null ">#{houseid},</if>
+            <if test="postId != null ">#{postId},</if>
+            <if test="remind != null ">#{remind},</if>
+            <if test="userId != null ">#{userId},</if>
+            <if test="dibProportion != null ">#{dibProportion},</if>
+            <if test="roomProportion != null ">#{roomProportion},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="completeProp != null  and completeProp != ''">#{completeProp},</if>
+            <if test="dibTime != null  and dibTime != ''">#{dibTime},</if>
+            <if test="roomPrpTime != null  and roomPrpTime != ''">#{roomPrpTime},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateSysCommission" parameterType="SysCommission">
+        update sys_commission
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="salesDetailId != null ">sales_detail_id = #{salesDetailId},</if>
+            <if test="houseid != null ">house_id = #{houseid},</if>
+            <if test="postId != null ">post_id = #{postId},</if>
+            <if test="remind != null ">remind = #{remind},</if>
+            <if test="userId != null ">user_id = #{userId},</if>
+            <if test="dibProportion != null ">dib_proportion = #{dibProportion},</if>
+            <if test="roomProportion != null ">room_proportion = #{roomProportion},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+            <if test="completeProp != null  and completeProp != ''">complete_prop = #{completeProp},</if>
+            <if test="dibTime != null  and dibTime != ''">dib_time = #{dibTime},</if>
+            <if test="roomPrpTime != null  and roomPrpTime != ''">room_prp_time = #{roomPrpTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where commission_id = #{commissionId}
+    </update>
+
+    <delete id="deleteSysCommissionById" parameterType="Long">
+        delete from sys_commission where commission_id = #{commissionId}
+    </delete>
+
+    <delete id="deleteSysCommissionByIds" parameterType="String">
+        delete from sys_commission where commission_id in
+        <foreach item="commissionId" collection="array" open="(" separator="," close=")">
+            #{commissionId}
+        </foreach>
+    </delete>
+
+</mapper>

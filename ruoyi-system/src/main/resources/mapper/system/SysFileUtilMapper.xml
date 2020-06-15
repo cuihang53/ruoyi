@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysFileUtilMapper">
+    
+    <resultMap type="SysFileUtil" id="SysFileUtilResult">
+        <result property="fileUtilId"    column="file_util_id"    />
+        <result property="fileUtilCode"    column="file_util_code"    />
+        <result property="fileAttachmentId"    column="file_attachment_id"    />
+        <result property="fileDomainId"    column="file_domain_id"    />
+        <association property="attachment"    column="file_attachment_id" javaType="SysAttachment" resultMap="attachmentResult" />
+    </resultMap>
+
+    <resultMap id="attachmentResult" type="SysAttachment">
+        <result property="fileId"    column="file_id"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="fileName"    column="file_name"    />
+    </resultMap>
+
+
+    <sql id="selectSysFileUtilVo">
+        select f.file_util_id, f.file_util_code, f.file_attachment_id, f.file_domain_id,s.file_path,s.file_name,s.file_id
+        from sys_file_util f
+        left join SYS_attachment s on s.file_id = f.file_attachment_id
+    </sql>
+
+    <select id="selectSysFileUtilList" parameterType="SysFileUtil" resultMap="SysFileUtilResult">
+        <include refid="selectSysFileUtilVo"/>
+        <where>  
+            <if test="fileUtilCode != null  and fileUtilCode != ''"> and file_util_code = #{fileUtilCode}</if>
+            <if test="fileAttachmentId != null "> and file_attachment_id = #{fileAttachmentId}</if>
+            <if test="fileDomainId != null "> and file_domain_id = #{fileDomainId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysFileUtilById" parameterType="Long" resultMap="SysFileUtilResult">
+        <include refid="selectSysFileUtilVo"/>
+        where file_util_id = #{fileUtilId}
+    </select>
+        
+    <insert id="insertSysFileUtil" parameterType="SysFileUtil" useGeneratedKeys="true" keyProperty="fileUtilId">
+        insert into sys_file_util
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileUtilCode != null  and fileUtilCode != ''">file_util_code,</if>
+            <if test="fileAttachmentId != null ">file_attachment_id,</if>
+            <if test="fileDomainId != null ">file_domain_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileUtilCode != null  and fileUtilCode != ''">#{fileUtilCode},</if>
+            <if test="fileAttachmentId != null ">#{fileAttachmentId},</if>
+            <if test="fileDomainId != null ">#{fileDomainId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysFileUtil" parameterType="SysFileUtil">
+        update sys_file_util
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fileUtilCode != null  and fileUtilCode != ''">file_util_code = #{fileUtilCode},</if>
+            <if test="fileAttachmentId != null ">file_attachment_id = #{fileAttachmentId},</if>
+            <if test="fileDomainId != null ">file_domain_id = #{fileDomainId},</if>
+        </trim>
+        where file_util_id = #{fileUtilId}
+    </update>
+
+    <delete id="deleteSysFileUtilById" parameterType="Long">
+        delete from sys_file_util where file_util_id = #{fileUtilId}
+    </delete>
+
+    <delete id="deleteSysFileUtilByIds" parameterType="String">
+        delete from sys_file_util where file_util_id in 
+        <foreach item="fileUtilId" collection="array" open="(" separator="," close=")">
+            #{fileUtilId}
+        </foreach>
+    </delete>
+    
+</mapper>

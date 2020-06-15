@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysSalesTeamMapper">
+    
+    <resultMap type="SysSalesTeam" id="SysSalesTeamResult">
+        <result property="id"    column="id"    />
+        <result property="teamName"    column="team_name"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysSalesTeamVo">
+        select id, team_name, create_by, create_time, update_by, update_time from sys_sales_team
+    </sql>
+
+    <select id="selectSysSalesTeamList" parameterType="SysSalesTeam" resultMap="SysSalesTeamResult">
+        <include refid="selectSysSalesTeamVo"/>
+        <where>  
+            <if test="teamName != null  and teamName != ''"> and team_name like concat('%', #{teamName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectSysSalesTeamById" parameterType="Long" resultMap="SysSalesTeamResult">
+        <include refid="selectSysSalesTeamVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysSalesTeam" parameterType="SysSalesTeam" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_sales_team
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="teamName != null  and teamName != ''">team_name,</if>
+            <if test="createBy != null  and createBy != ''">create_by,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="updateBy != null  and updateBy != ''">update_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="teamName != null  and teamName != ''">#{teamName},</if>
+            <if test="createBy != null  and createBy != ''">#{createBy},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysSalesTeam" parameterType="SysSalesTeam">
+        update sys_sales_team
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="teamName != null  and teamName != ''">team_name = #{teamName},</if>
+            <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysSalesTeamById" parameterType="Long">
+        delete from sys_sales_team where id = #{id}
+    </delete>
+
+    <delete id="deleteSysSalesTeamByIds" parameterType="String">
+        delete from sys_sales_team where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
